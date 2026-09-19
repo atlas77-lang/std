@@ -1,0 +1,16 @@
+// DISCLAIMER: This is not the final version of any concepts. 
+// Most of them are subject to change once I allow for generic concepts.
+// e.g. extendable will probably also become generic to allow checks 
+// about the kind of type that This can be extended with
+
+import "concepts/primitive.atlas";
+import "concepts/number.atlas";
+import "concepts/comparable.atlas";
+import "concepts/iterator.atlas";
+import "concepts/indexable.atlas";
+import "concepts/default.atlas";
+import "concepts/copyable.atlas";
+import "concepts/hashable.atlas";
+import "concepts/extendable.atlas";
+import "concepts/to_string.atlas";
+

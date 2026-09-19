@@ -1,0 +1,17 @@
+[package]
+name = "atlas77-std"
+version = "0.1.0"
+entry = "src/main.atlas"
+compiler = "gcc"
+args = ["-std=c2y"]
+
+[c]
+include_dirs = ["include/"]
+headers = ["atlas77_std_c_impl.h"]
+
+[c.windows]
+include_dirs = []
+headers = []
+
+[c.linux]
+lib_dirs = []

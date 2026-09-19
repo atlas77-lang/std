@@ -1,0 +1,14 @@
+//WARNING: Outdated
+
+import "vector.atlas";
+import "optional.atlas";
+import "string.atlas";
+import "memory.atlas";
+
+namespace std {
+    //! An iterator over an array of `T`.
+    public struct iter<T> {
+        
+    }
+
+}

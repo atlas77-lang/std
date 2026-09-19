@@ -1,0 +1,7 @@
+namespace std {
+    public struct pair<A, B> {
+      public:
+        a: A;
+        b: B;
+    }
+}

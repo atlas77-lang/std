@@ -1,0 +1,22 @@
+import "concepts/iterator.atlas";
+
+namespace std {
+    public struct range {
+      public:
+        start: uint64;
+        end: uint64;
+        fun new(start: uint64, end: uint64) -> This {
+            return std::range {
+                .start = start,
+                .end   = end,
+            };
+        }
+    }
+    extend std::range with std::iterable {
+        // self
+        type iterator_t = std::range;
+        fun iter(*this) -> This::iterator_t {
+            
+        }
+    }
+}
