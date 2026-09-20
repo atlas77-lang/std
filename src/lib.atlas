@@ -15,3 +15,7 @@ import "shared_ptr.atlas";
 import "string.atlas";
 import "time.atlas";
 import "vector.atlas";
+
+//! Standard library for the atlas77 programming language.
+//! As of today it's still way too unstable...
+namespace std {}

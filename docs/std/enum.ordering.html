@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>std::ordering</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<nav id="sidebar">
+<a class="home" href="../index.html">Index</a>
+<div class="ns" style="padding-left:0px"><a href="../core/index.html">core</a></div>
+<div class="item" style="padding-left:16px"><a href="../core/struct.type_info.html">type_info</a></div>
+<div class="ns" style="padding-left:0px"><a href="../libc/index.html">libc</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.eof.html">EOF</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/struct.file.html">FILE</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.calloc.html">calloc</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.errno.html">errno</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.fclose.html">fclose</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.feof.html">feof</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.fflush.html">fflush</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.fopen.html">fopen</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.fread.html">fread</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.free.html">free</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.fseek.html">fseek</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.ftell.html">ftell</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.fwrite.html">fwrite</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.get_char.html">get_char</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.malloc.html">malloc</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.mem_cmp.html">mem_cmp</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.memcpy.html">memcpy</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.realloc.html">realloc</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.snprintf.html">snprintf</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.str_error.html">str_error</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.str_len.html">str_len</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.to_lower.html">to_lower</a></div>
+<div class="item" style="padding-left:16px"><a href="../libc/fn.to_upper.html">to_upper</a></div>
+<div class="ns" style="padding-left:0px"><a href="../std/index.html">std</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.file_mode.html">FILE_MODE</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.stdin.html">Stdin</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.abs.html">abs</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.abs_i64.html">abs_i64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.absf.html">absf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.absf64.html">absf64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.acos.html">acos</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.acosh.html">acosh</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.alloc.html">alloc</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.any.html">any</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.asin.html">asin</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.asinh.html">asinh</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.atan.html">atan</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.atan2.html">atan2</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.atanh.html">atanh</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_close.html">atlas_directory_close</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.cos.html">cos</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.cosh.html">cosh</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.default.html">default</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.deleter.html">deleter</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.directory.html">directory</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.duration.html">duration</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.either.html">either</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.empty.html">empty</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.exp.html">exp</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.exp2.html">exp2</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.exp2f.html">exp2f</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.expected.html">expected</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.expf.html">expf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.extendable.html">extendable</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.file.html">file</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.floor.html">floor</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.floorf.html">floorf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.hashable.html">hashable</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.hypotf.html">hypotf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.hypotf64.html">hypotf64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.indexable.html">indexable</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.input.html">input</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.instant.html">instant</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.iterable.html">iterable</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.iterator.html">iterator</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.log.html">log</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.log10.html">log10</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.log10f.html">log10f</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.log2.html">log2</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.log2f.html">log2f</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.logf.html">logf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.map.html">map</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.max.html">max</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.maxf.html">maxf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.maxf64.html">maxf64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.min.html">min</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.minf.html">minf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.minf64.html">minf64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.modf.html">modf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.modf64.html">modf64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.number.html">number</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.optional.html">optional</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.ordering.html">ordering</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.panic.html">panic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.pow.html">pow</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.pow_i64.html">pow_i64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.powf.html">powf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.primitive.html">primitive</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.print.html">print</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.printf.html">printf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.println.html">println</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.round.html">round</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.round_i64.html">round_i64</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.roundf.html">roundf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.shared_ptr.html">shared_ptr</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.sin.html">sin</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.sinh.html">sinh</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.sqrt.html">sqrt</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.sqrtf.html">sqrtf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.string.html">string</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.take.html">take</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.tan.html">tan</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.tanh.html">tanh</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/concept.to_string.html">to_string</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.trunc.html">trunc</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.truncf.html">truncf</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.vector.html">vector</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/struct.weak_ptr.html">weak_ptr</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/fn.zero_alloc.html">zero_alloc</a></div>
+<div class="ns" style="padding-left:12px"><a href="../std/ptr/index.html">ptr</a></div>
+<div class="item" style="padding-left:28px"><a href="../std/ptr/fn.swap.html">swap</a></div>
+<div class="item"><a href="../fn.atomic_var_init.html">ATOMIC_VAR_INIT</a></div>
+<div class="item"><a href="../fn.alignof.html">alignof</a></div>
+<div class="item"><a href="../fn.c_errno.html">c_errno</a></div>
+<div class="item"><a href="../fn.sizeof.html">sizeof</a></div>
+<div class="item"><a href="../fn.strerror.html">strerror</a></div>
+</nav>
+<main id="content">
+<h1><span class="kind">Enum</span> std::ordering</h1>
+<pre class="code">enum std::ordering</pre>
+<p class="source">Declared in <a href="../files/src-concepts-comparable.atlas.html">src/concepts/comparable.atlas</a></p>
+<section>
+<h2>Variants</h2>
+<div class="member" id="variant.less">
+<pre class="code">LESS = 18446744073709551615</pre>
+</div>
+<div class="member" id="variant.equal">
+<pre class="code">EQUAL = 0</pre>
+</div>
+<div class="member" id="variant.greater">
+<pre class="code">GREATER = 1</pre>
+</div>
+</section>
+</main>
+<footer>Generated by <code>atlas77 docs</code></footer>
+</body>
+</html>

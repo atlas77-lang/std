@@ -1,7 +1,7 @@
-// Per the upcoming v0.10 design of the compiler, this std::primitive
-// concept, will become a compiler tag. Alongside std::integer & std::float
-// Though some of those tags will be made available on some types 
-// through flags. Undecided how to properly do that.
+//! Per the upcoming v0.10 design of the compiler, this std::primitive
+//! concept, will become a compiler tag. Alongside std::integer & std::float
+//! Though some of those tags will be made available on some types 
+//! through flags. Undecided how to properly do that.
 
 namespace std {
     // TODO: Make this concepts locked. Nobody should be able
