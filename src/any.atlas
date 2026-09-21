@@ -75,9 +75,6 @@ namespace std {
         //! Returns a const pointer to the held value, or a `std::cast_error` if it isn't a `T` or has already been taken out.
         //!
         //! The `std::any` keeps ownership of the value, the pointer is only valid as long as the `std::any` lives.
-        //!
-        //! TODO: Once the as operator will be overloadable, if the held type isn't T,
-        //! but can be casted to T, you will be able to get a T type from a U held type.
         fun get<T>(*const this) -> std::expected<*const T, std::cast_error> {
             if this->type_info.id != type_id<T>() {
                 return std::expected<
@@ -101,9 +98,6 @@ namespace std {
         //! Returns a mutable pointer to the held value, or a `std::cast_error` if it isn't a `T` or has already been taken out.
         //!
         //! The `std::any` keeps ownership of the value, the pointer is only valid as long as the `std::any` lives.
-        //!
-        //! TODO: Once the as operator will be overloadable, if the held type isn't T,
-        //! but can be casted to T, you will be able to get a T type from a U held type.
         fun get_mut<T>(*this) -> std::expected<*T, std::cast_error> {
             if this->type_info.id != type_id<T>() {
                 return std::expected<
@@ -127,9 +121,6 @@ namespace std {
         //! Takes the value out of the container, leaving it empty. Returns a `std::cast_error` if the held value isn't a `T` or was already taken.
         //!
         //! After this call, `has_value()` returns false and any further `cast<T>()` returns `MOVED_ANY_VALUE`.
-        //!
-        //! TODO: Once the as operator will be overloadable, if the held type isn't T,
-        //! but can be casted to T, you will be able to get a T type from a U held type.
         fun cast<T>(this) -> std::expected<T, std::cast_error> {
             if this.type_info.id != type_id<T>() {
                 return std::expected<

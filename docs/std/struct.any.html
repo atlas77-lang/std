@@ -159,22 +159,16 @@ let owned = a.cast&lt;int64&gt;(); // 42, a is now empty
 <pre class="code">fun cast(this) -&gt; std::expected&lt;T, std::cast_error&gt; </pre>
 <p>Takes the value out of the container, leaving it empty. Returns a <code>std::cast_error</code> if the held value isn’t a <code>T</code> or was already taken.</p>
 <p>After this call, <code>has_value()</code> returns false and any further <code>cast&lt;T&gt;()</code> returns <code>MOVED_ANY_VALUE</code>.</p>
-<p>TODO: Once the as operator will be overloadable, if the held type isn’t T,
-but can be casted to T, you will be able to get a T type from a U held type.</p>
 </div>
 <div class="member" id="method.get">
 <pre class="code">fun get(*const this) -&gt; std::expected&lt;*const T, std::cast_error&gt; </pre>
 <p>Returns a const pointer to the held value, or a <code>std::cast_error</code> if it isn’t a <code>T</code> or has already been taken out.</p>
 <p>The <code>std::any</code> keeps ownership of the value, the pointer is only valid as long as the <code>std::any</code> lives.</p>
-<p>TODO: Once the as operator will be overloadable, if the held type isn’t T,
-but can be casted to T, you will be able to get a T type from a U held type.</p>
 </div>
 <div class="member" id="method.get_mut">
 <pre class="code">fun get_mut(*this) -&gt; std::expected&lt;*T, std::cast_error&gt; </pre>
 <p>Returns a mutable pointer to the held value, or a <code>std::cast_error</code> if it isn’t a <code>T</code> or has already been taken out.</p>
 <p>The <code>std::any</code> keeps ownership of the value, the pointer is only valid as long as the <code>std::any</code> lives.</p>
-<p>TODO: Once the as operator will be overloadable, if the held type isn’t T,
-but can be casted to T, you will be able to get a T type from a U held type.</p>
 </div>
 <div class="member" id="method.has_value">
 <pre class="code">fun has_value(*const this) -&gt; bool </pre>
