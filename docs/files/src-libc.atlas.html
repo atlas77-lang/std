@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,29 +145,29 @@
 <h1>src/libc.atlas</h1>
 <section>
 <h2>Structs</h2>
-<ul class="listing"><li><a href="../libc/struct.file.html"><code>libc::FILE</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="../libc/struct.file.html"><code>libc::FILE</code></a> <span class="blurb">Opaque C file stream. You never build one yourself, `fopen` hands you a pointer to it.</span></li>
 </ul></section>
 <section>
 <h2>Functions</h2>
 <ul class="listing"><li><a href="../libc/fn.eof.html"><code>libc::EOF</code></a> <span class="blurb">Not really a libc function. Will become a constant later</span></li>
-<li><a href="../libc/fn.calloc.html"><code>libc::calloc</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.errno.html"><code>libc::errno</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.fclose.html"><code>libc::fclose</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.feof.html"><code>libc::feof</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.fflush.html"><code>libc::fflush</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.fopen.html"><code>libc::fopen</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.fread.html"><code>libc::fread</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.free.html"><code>libc::free</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.fseek.html"><code>libc::fseek</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.ftell.html"><code>libc::ftell</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.fwrite.html"><code>libc::fwrite</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.get_char.html"><code>libc::get_char</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.malloc.html"><code>libc::malloc</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.mem_cmp.html"><code>libc::mem_cmp</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.memcpy.html"><code>libc::memcpy</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.realloc.html"><code>libc::realloc</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.snprintf.html"><code>libc::snprintf</code></a> <span class="blurb"></span></li>
-<li><a href="../libc/fn.str_error.html"><code>libc::str_error</code></a> <span class="blurb"></span></li>
+<li><a href="../libc/fn.calloc.html"><code>libc::calloc</code></a> <span class="blurb">Allocates a zeroed buffer of `nelem * elsize` bytes. Returns `null` on failure.</span></li>
+<li><a href="../libc/fn.errno.html"><code>libc::errno</code></a> <span class="blurb">Returns the current value of the C `errno`. Set by most libc functions when they fail.</span></li>
+<li><a href="../libc/fn.fclose.html"><code>libc::fclose</code></a> <span class="blurb">Closes the given file stream. Returns `0` on success.</span></li>
+<li><a href="../libc/fn.feof.html"><code>libc::feof</code></a> <span class="blurb">Returns a non-zero value once the end of `f` has been reached.</span></li>
+<li><a href="../libc/fn.fflush.html"><code>libc::fflush</code></a> <span class="blurb">Forces any buffered output of `f` to be written out. Returns `0` on success.</span></li>
+<li><a href="../libc/fn.fopen.html"><code>libc::fopen</code></a> <span class="blurb">Opens the file at `path` with the given C mode string (`&quot;r&quot;`, `&quot;w&quot;`, `&quot;a&quot;`, `&quot;r+&quot;`...). Returns `null` on failure, in which case `errno` is set.</span></li>
+<li><a href="../libc/fn.fread.html"><code>libc::fread</code></a> <span class="blurb">Reads up to `nmemb` items of `size` bytes each from `f` into `buf`. Returns the number of items actually read.</span></li>
+<li><a href="../libc/fn.free.html"><code>libc::free</code></a> <span class="blurb">Releases memory previously obtained from `malloc`, `calloc` or `realloc`. Passing `null` is a no-op.</span></li>
+<li><a href="../libc/fn.fseek.html"><code>libc::fseek</code></a> <span class="blurb">Moves the position of `f` by `offset` bytes relative to `whence` (`0` = start, `1` = current position, `2` = end). Returns `0` on success.</span></li>
+<li><a href="../libc/fn.ftell.html"><code>libc::ftell</code></a> <span class="blurb">Returns the current position of `f` in bytes, or `-1` on failure.</span></li>
+<li><a href="../libc/fn.fwrite.html"><code>libc::fwrite</code></a> <span class="blurb">Writes `nmemb` items of `size` bytes each from `buf` into `f`. Returns the number of items actually written.</span></li>
+<li><a href="../libc/fn.get_char.html"><code>libc::get_char</code></a> <span class="blurb">Reads a single character from standard input. Returns `libc::EOF()` once there is nothing left to read.</span></li>
+<li><a href="../libc/fn.malloc.html"><code>libc::malloc</code></a> <span class="blurb">Allocates `size` bytes of uninitialized memory. Returns `null` on failure.</span></li>
+<li><a href="../libc/fn.mem_cmp.html"><code>libc::mem_cmp</code></a> <span class="blurb">Compares the first `size` bytes of `a` and `b`. Returns `0` if they are equal, a negative value if `a` is lower, a positive one otherwise.</span></li>
+<li><a href="../libc/fn.memcpy.html"><code>libc::memcpy</code></a> <span class="blurb">Copies `size` bytes from `src` to `dest` and returns `dest`. The two buffers must not overlap.</span></li>
+<li><a href="../libc/fn.realloc.html"><code>libc::realloc</code></a> <span class="blurb">Resizes the buffer behind `ptr` to `size` bytes, moving it if necessary. Returns `null` on failure.</span></li>
+<li><a href="../libc/fn.snprintf.html"><code>libc::snprintf</code></a> <span class="blurb">Writes `val` into `s` following the C `format` string, writing at most `size` bytes. Returns the number of bytes that would have been written if `size` was big enough.</span></li>
+<li><a href="../libc/fn.str_error.html"><code>libc::str_error</code></a> <span class="blurb">Returns a human readable message for the given error code (usually the value of `errno()`).</span></li>
 <li><a href="../libc/fn.str_len.html"><code>libc::str_len</code></a> <span class="blurb">Takes a `*const uint8` and returns its length as `uint64`.</span></li>
 <li><a href="../libc/fn.to_lower.html"><code>libc::to_lower</code></a> <span class="blurb">Takes a single character and returns its lowercase equivalent if it&#39;s an uppercase letter, otherwise returns the character unchanged.</span></li>
 <li><a href="../libc/fn.to_upper.html"><code>libc::to_upper</code></a> <span class="blurb">Takes a single character and returns its uppercase equivalent if it&#39;s a lowercase letter, otherwise returns the character unchanged.</span></li>

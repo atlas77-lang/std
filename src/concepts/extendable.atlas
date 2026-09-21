@@ -1,8 +1,14 @@
+//! `std::extendable`: containers that can absorb the content of an iterable. Nothing implements it yet.
+
 namespace std {
     // TODO: extendable should be extendable<T>
     // And only accepts I where I: std::iterator_of<T> 
     // Or some shit, to ensure the type the iterator yields is the type you require
+    //! Containers that can be extended with the content of anything `std::iterable`.
+    //!
+    //! NB: Nothing in the std implements it yet. `std::vector<T>::append` only takes another vector for now.
     public concept extendable {
+        //! Appends every value yielded by `iter` to `this`.
         fun append<I>(*this, iter: I) where I: std::iterable;
     }
 }

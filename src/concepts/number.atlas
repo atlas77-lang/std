@@ -1,7 +1,19 @@
+//! `std::number`: the `MIN()`/`MAX()` bounds of every numeric primitive.
+
 namespace std {
+    //! Numeric types with a known range. Gives access to the smallest and largest value of the type.
+    //!
+    //! ```
+    //! let biggest = int32::MAX(); // 2147483647
+    //! let smallest = uint8::MIN(); // 0
+    //! ```
+    //!
+    //! NB: For the floats, `MIN()` is the smallest positive subnormal value, not the most negative one, like C's `FLT_MIN`.
     public concept number {
         // TODO: Make this into constants attached to a type in the refactor
+        //! Largest value representable by the type.
         fun MAX() -> This;
+        //! Smallest value representable by the type (smallest positive one for floats).
         fun MIN() -> This;
     }
     extend int8 with std::number {

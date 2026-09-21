@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,10 +145,17 @@
 <h1><span class="kind">Concept</span> std::default</h1>
 <pre class="code">concept std::default</pre>
 <p class="source">Declared in <a href="../files/src-concepts-default.atlas.html">src/concepts/default.atlas</a></p>
+<p>Types that have a sensible “zero” value, obtained through <code>T::default()</code>.</p>
+<p>Numbers default to <code>0</code>, <code>bool</code> to <code>false</code>, <code>char</code> to <code>'\0'</code>, <code>str</code> to <code>""</code> and every pointer type to <code>null</code>.
+Needed by <code>std::take&lt;T&gt;()</code>, which has to leave something valid behind once it took the value out.</p>
+<pre><code>let n = int64::default(); // 0
+let s = std::string::default(); // ""
+</code></pre>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.default">
 <pre class="code">fun default() -&gt; This </pre>
+<p>Returns the default value of the type.</p>
 </div>
 </section>
 <section>

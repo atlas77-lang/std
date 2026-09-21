@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,16 +145,20 @@
 <h1><span class="kind">Concept</span> std::iterable</h1>
 <pre class="code">concept std::iterable</pre>
 <p class="source">Declared in <a href="../files/src-concepts-iterator.atlas.html">src/concepts/iterator.atlas</a></p>
+<p>Something that can produce a <code>std::iterator</code> over its content.</p>
+<p>NB: Nothing in the std implements it yet.</p>
 <section>
 <h2>Associated types</h2>
 <div class="member" id="type.iterator_t">
 <pre class="code">type iterator_t</pre>
+<p>The type of the iterator returned by <code>iter()</code>. Should implement <code>std::iterator</code>.</p>
 </div>
 </section>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.iter">
 <pre class="code">fun iter(*this) -&gt; This::iterator_t </pre>
+<p>Returns a new iterator over the content of <code>this</code>.</p>
 </div>
 </section>
 </main>

@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,10 +145,25 @@
 <h1><span class="kind">Concept</span> std::copyable</h1>
 <pre class="code">concept std::copyable</pre>
 <p class="source">Declared in <a href="../files/src-concepts-copyable.atlas.html">src/concepts/copyable.atlas</a></p>
+<p>Types that can be explicitly duplicated with <code>.copy()</code>.</p>
+<p>Atlas77 moves values by default, nothing is copied behind your back. When you need a second,
+independent value, the type has to implement this concept and you have to call <code>copy()</code> yourself.</p>
+<p>The result must be equal to the original: if <code>operator::equal</code> is implemented, this should hold true:</p>
+<pre><code>let a = ...;
+let b = a.copy();
+a == b; // true
+</code></pre>
+<p>What “equal” means is up to the type. e.g. <code>std::shared_ptr&lt;T&gt;::copy()</code> doesn’t duplicate the pointed value,
+it only increments the reference count, but <code>a == b</code> still holds true.</p>
+<p>All the numeric primitives implement it as a plain bitwise copy.</p>
+<p>TODO: This concept could be an auto derive concept for <code>std::trivially_copyable</code> type.
+Though, that might introduce “<em>magic</em>” that users don’t want. Right now you have to write every implementation out.
+It’s mostly just thought as a simple way of doing things.</p>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.copy">
 <pre class="code">fun copy(*const this) -&gt; This </pre>
+<p>Returns a new value equal to <code>this</code>. The original is left untouched.</p>
 </div>
 </section>
 <section>
@@ -170,6 +185,10 @@
 </div>
 <div class="member">
 <pre class="code">extend int8 with std::copyable</pre>
+</div>
+<div class="member">
+<pre class="code">extend std::shared_ptr&lt;T&gt; with std::copyable</pre>
+<p>Copying a <code>std::shared_ptr</code> doesn’t copy the value, it adds a new owner: the reference count is incremented.</p>
 </div>
 <div class="member">
 <pre class="code">extend uint16 with std::copyable</pre>

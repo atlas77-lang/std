@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -143,63 +143,67 @@
 </nav>
 <main id="content">
 <h1>src/math.atlas</h1>
+<p>Math utilities backed by the C standard math library.</p>
+<p>Most functions come in two flavours: the <code>float64</code> one and the <code>float32</code> one, the latter with an <code>f</code> suffix
+(<code>sqrt</code>/<code>sqrtf</code>, <code>floor</code>/<code>floorf</code>…). The trigonometric and hyperbolic functions only exist for <code>float32</code> for now.
+A few integer helpers (<code>min</code>, <code>max</code>, <code>pow_i64</code>) are written in atlas since C has no equivalent.</p>
 <section>
 <h2>Functions</h2>
-<ul class="listing"><li><a href="../std/fn.abs.html"><code>std::abs</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.abs_i64.html"><code>std::abs_i64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.absf.html"><code>std::absf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.absf64.html"><code>std::absf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.acos.html"><code>std::acos</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.acosh.html"><code>std::acosh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.asin.html"><code>std::asin</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.asinh.html"><code>std::asinh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atan.html"><code>std::atan</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atan2.html"><code>std::atan2</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atanh.html"><code>std::atanh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cbrt.html"><code>std::cbrt</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cbrtf.html"><code>std::cbrtf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.ceil.html"><code>std::ceil</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.ceilf.html"><code>std::ceilf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.copysign.html"><code>std::copysign</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.copysignf64.html"><code>std::copysignf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cos.html"><code>std::cos</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cosh.html"><code>std::cosh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.exp.html"><code>std::exp</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.exp2.html"><code>std::exp2</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.exp2f.html"><code>std::exp2f</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.expf.html"><code>std::expf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.floor.html"><code>std::floor</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.floorf.html"><code>std::floorf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.hypotf.html"><code>std::hypotf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.hypotf64.html"><code>std::hypotf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log.html"><code>std::log</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log10.html"><code>std::log10</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log10f.html"><code>std::log10f</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log2.html"><code>std::log2</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log2f.html"><code>std::log2f</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.logf.html"><code>std::logf</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="../std/fn.abs.html"><code>std::abs</code></a> <span class="blurb">Absolute value of an `int32`.</span></li>
+<li><a href="../std/fn.abs_i64.html"><code>std::abs_i64</code></a> <span class="blurb">Absolute value of an `int64`.</span></li>
+<li><a href="../std/fn.absf.html"><code>std::absf</code></a> <span class="blurb">Absolute value of a `float32`.</span></li>
+<li><a href="../std/fn.absf64.html"><code>std::absf64</code></a> <span class="blurb">Absolute value of a `float64`.</span></li>
+<li><a href="../std/fn.acos.html"><code>std::acos</code></a> <span class="blurb">Arc cosine of `x`, in radians in `[0, pi]`. `x` must be in `[-1, 1]`.</span></li>
+<li><a href="../std/fn.acosh.html"><code>std::acosh</code></a> <span class="blurb">Inverse hyperbolic cosine of `x`. `x` must be greater or equal to `1`.</span></li>
+<li><a href="../std/fn.asin.html"><code>std::asin</code></a> <span class="blurb">Arc sine of `x`, in radians in `[-pi/2, pi/2]`. `x` must be in `[-1, 1]`.</span></li>
+<li><a href="../std/fn.asinh.html"><code>std::asinh</code></a> <span class="blurb">Inverse hyperbolic sine of `x`.</span></li>
+<li><a href="../std/fn.atan.html"><code>std::atan</code></a> <span class="blurb">Arc tangent of `x`, in radians in `[-pi/2, pi/2]`.</span></li>
+<li><a href="../std/fn.atan2.html"><code>std::atan2</code></a> <span class="blurb">Arc tangent of `y / x`, in radians in `[-pi, pi]`, using the signs of both arguments to pick the right quadrant.</span></li>
+<li><a href="../std/fn.atanh.html"><code>std::atanh</code></a> <span class="blurb">Inverse hyperbolic tangent of `x`. `x` must be in `(-1, 1)`.</span></li>
+<li><a href="../std/fn.cbrt.html"><code>std::cbrt</code></a> <span class="blurb">Cube root of `x`. Works for negative values too.</span></li>
+<li><a href="../std/fn.cbrtf.html"><code>std::cbrtf</code></a> <span class="blurb">`float32` version of `cbrt`.</span></li>
+<li><a href="../std/fn.ceil.html"><code>std::ceil</code></a> <span class="blurb">Rounds `x` up to the smallest integer not less than `x`. `ceil(2.2) == 3.0`, `ceil(-2.2) == -2.0`.</span></li>
+<li><a href="../std/fn.ceilf.html"><code>std::ceilf</code></a> <span class="blurb">`float32` version of `ceil`.</span></li>
+<li><a href="../std/fn.copysign.html"><code>std::copysign</code></a> <span class="blurb">`float32` version of `copysignf64`.</span></li>
+<li><a href="../std/fn.copysignf64.html"><code>std::copysignf64</code></a> <span class="blurb">Returns `x` with the sign of `y`.</span></li>
+<li><a href="../std/fn.cos.html"><code>std::cos</code></a> <span class="blurb">Cosine of `x` (in radians).</span></li>
+<li><a href="../std/fn.cosh.html"><code>std::cosh</code></a> <span class="blurb">Hyperbolic cosine of `x`.</span></li>
+<li><a href="../std/fn.exp.html"><code>std::exp</code></a> <span class="blurb">`e` raised to the power `x`.</span></li>
+<li><a href="../std/fn.exp2.html"><code>std::exp2</code></a> <span class="blurb">`2` raised to the power `x`.</span></li>
+<li><a href="../std/fn.exp2f.html"><code>std::exp2f</code></a> <span class="blurb">`float32` version of `exp2`.</span></li>
+<li><a href="../std/fn.expf.html"><code>std::expf</code></a> <span class="blurb">`float32` version of `exp`.</span></li>
+<li><a href="../std/fn.floor.html"><code>std::floor</code></a> <span class="blurb">Rounds `x` down to the largest integer not greater than `x`. `floor(2.7) == 2.0`, `floor(-2.7) == -3.0`.</span></li>
+<li><a href="../std/fn.floorf.html"><code>std::floorf</code></a> <span class="blurb">`float32` version of `floor`.</span></li>
+<li><a href="../std/fn.hypotf.html"><code>std::hypotf</code></a> <span class="blurb">`float32` version of `hypotf64`.</span></li>
+<li><a href="../std/fn.hypotf64.html"><code>std::hypotf64</code></a> <span class="blurb">Length of the hypotenuse of a right triangle with sides `x` and `y`, i.e. `sqrt(x * x + y * y)` without the overflow.</span></li>
+<li><a href="../std/fn.log.html"><code>std::log</code></a> <span class="blurb">Natural logarithm (base `e`) of `x`.</span></li>
+<li><a href="../std/fn.log10.html"><code>std::log10</code></a> <span class="blurb">Base 10 logarithm of `x`.</span></li>
+<li><a href="../std/fn.log10f.html"><code>std::log10f</code></a> <span class="blurb">`float32` version of `log10`.</span></li>
+<li><a href="../std/fn.log2.html"><code>std::log2</code></a> <span class="blurb">Base 2 logarithm of `x`.</span></li>
+<li><a href="../std/fn.log2f.html"><code>std::log2f</code></a> <span class="blurb">`float32` version of `log2`.</span></li>
+<li><a href="../std/fn.logf.html"><code>std::logf</code></a> <span class="blurb">`float32` version of `log`.</span></li>
 <li><a href="../std/fn.max.html"><code>std::max</code></a> <span class="blurb">Integer maximum. C has no standard fmax-like integer function.</span></li>
-<li><a href="../std/fn.maxf.html"><code>std::maxf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.maxf64.html"><code>std::maxf64</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.maxf.html"><code>std::maxf</code></a> <span class="blurb">`float32` version of `maxf64`.</span></li>
+<li><a href="../std/fn.maxf64.html"><code>std::maxf64</code></a> <span class="blurb">Largest of `x` and `y`. If one of them is NaN, the other one is returned.</span></li>
 <li><a href="../std/fn.min.html"><code>std::min</code></a> <span class="blurb">Integer minimum. C has no standard fmin-like integer function.</span></li>
-<li><a href="../std/fn.minf.html"><code>std::minf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.minf64.html"><code>std::minf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.modf.html"><code>std::modf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.modf64.html"><code>std::modf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.pow.html"><code>std::pow</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.minf.html"><code>std::minf</code></a> <span class="blurb">`float32` version of `minf64`.</span></li>
+<li><a href="../std/fn.minf64.html"><code>std::minf64</code></a> <span class="blurb">Smallest of `x` and `y`. If one of them is NaN, the other one is returned.</span></li>
+<li><a href="../std/fn.modf.html"><code>std::modf</code></a> <span class="blurb">`float32` version of `modf64`.</span></li>
+<li><a href="../std/fn.modf64.html"><code>std::modf64</code></a> <span class="blurb">Floating point remainder of `x / y`. The result has the sign of `x`.</span></li>
+<li><a href="../std/fn.pow.html"><code>std::pow</code></a> <span class="blurb">`x` raised to the power `y`. See `pow_i64` for integers.</span></li>
 <li><a href="../std/fn.pow_i64.html"><code>std::pow_i64</code></a> <span class="blurb">Integer power.</span></li>
-<li><a href="../std/fn.powf.html"><code>std::powf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.round.html"><code>std::round</code></a> <span class="blurb">Math utilities backed by the C standard math library.</span></li>
-<li><a href="../std/fn.round_i64.html"><code>std::round_i64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.roundf.html"><code>std::roundf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sin.html"><code>std::sin</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sinh.html"><code>std::sinh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sqrt.html"><code>std::sqrt</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sqrtf.html"><code>std::sqrtf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.tan.html"><code>std::tan</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.tanh.html"><code>std::tanh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.trunc.html"><code>std::trunc</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.truncf.html"><code>std::truncf</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.powf.html"><code>std::powf</code></a> <span class="blurb">`float32` version of `pow`.</span></li>
+<li><a href="../std/fn.round.html"><code>std::round</code></a> <span class="blurb">Rounds `x` to the nearest integer, halfway cases away from zero. `round(2.5) == 3.0`, `round(-2.5) == -3.0`.</span></li>
+<li><a href="../std/fn.round_i64.html"><code>std::round_i64</code></a> <span class="blurb">Rounds `x` to the nearest integer, halfway cases away from zero, and returns it as an `int64`.</span></li>
+<li><a href="../std/fn.roundf.html"><code>std::roundf</code></a> <span class="blurb">`float32` version of `round`.</span></li>
+<li><a href="../std/fn.sin.html"><code>std::sin</code></a> <span class="blurb">Sine of `x` (in radians).</span></li>
+<li><a href="../std/fn.sinh.html"><code>std::sinh</code></a> <span class="blurb">Hyperbolic sine of `x`.</span></li>
+<li><a href="../std/fn.sqrt.html"><code>std::sqrt</code></a> <span class="blurb">Square root of `x`. Returns NaN if `x` is negative.</span></li>
+<li><a href="../std/fn.sqrtf.html"><code>std::sqrtf</code></a> <span class="blurb">`float32` version of `sqrt`.</span></li>
+<li><a href="../std/fn.tan.html"><code>std::tan</code></a> <span class="blurb">Tangent of `x` (in radians).</span></li>
+<li><a href="../std/fn.tanh.html"><code>std::tanh</code></a> <span class="blurb">Hyperbolic tangent of `x`.</span></li>
+<li><a href="../std/fn.trunc.html"><code>std::trunc</code></a> <span class="blurb">Rounds `x` toward zero, dropping the fractional part. `trunc(2.7) == 2.0`, `trunc(-2.7) == -2.0`.</span></li>
+<li><a href="../std/fn.truncf.html"><code>std::truncf</code></a> <span class="blurb">`float32` version of `trunc`.</span></li>
 </ul></section>
 </main>
 <footer>Generated by <code>atlas77 docs</code></footer>

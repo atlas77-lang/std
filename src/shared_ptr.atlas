@@ -1,9 +1,12 @@
+//! Reference counted smart pointer: `std::shared_ptr<T>` and its (unfinished) companion `std::weak_ptr<T>`.
+
 import "memory.atlas";
 import "io.atlas";
 import "atomic.atlas";
 import "libc.atlas";
 
 namespace std {
+    //! Heap allocated bookkeeping shared by every `std::shared_ptr` (and `std::weak_ptr`) pointing to the same value.
     private struct __control_block<T> {
       public:
         ref_count: std::atomic<int64>;
@@ -12,6 +15,19 @@ namespace std {
     }
 
     // TODO: Add `A: std::allocator = std::default_allocator` generic parameter for custom allocators
+    //! A pointer to a heap allocated `T` shared between several owners. The value is destroyed once the last owner is gone.
+    //!
+    //! Every `copy()` increments an atomic reference count, every destructor decrements it. When it reaches zero,
+    //! the value's destructor runs and the memory is freed. The count is atomic, so the pointer can be shared across threads.
+    //!
+    //! ```
+    //! let a = std::shared_ptr<int64>::new(42);
+    //! let b = a.copy();       // use_count() == 2
+    //! let value = *a.get();   // 42
+    //! ```
+    //!
+    //! > **NB**: The value itself isn't protected in any way, only the reference count is. Mutating it through
+    //! > `get_mut()` from several threads at once is a data race.
     public struct shared_ptr<T> {
       private:
         cb: *std::__control_block<T>;
@@ -26,9 +42,11 @@ namespace std {
             }
         }
       public:
+        //! Decrements the reference count. If this was the last owner, destroys the value and frees the control block.
         ~shared_ptr() {
             this->release();
         }
+        //! Creates a new `std::shared_ptr` owning `val`. The value is moved into a fresh heap allocation.
         fun new(val: T) -> std::shared_ptr<T> {
             let cb = std::zero_alloc<std::__control_block<T>>(1);
             cb->ref_count.store(1);
@@ -41,7 +59,10 @@ namespace std {
                 .ptr = ptr,
             };
         }
-        //! Unsafe
+        //! Takes ownership of an already allocated `T`. Unsafe.
+        //!
+        //! `ptr` must come from `std::alloc<T>()`/`libc::malloc` (or equivalent), since it will be
+        //! destroyed with `std::deleter<T>` once the last owner is gone. Don't free it yourself afterwards.
         fun from_raw(ptr: *T) -> std::shared_ptr<T> {
             let cb = std::zero_alloc<std::__control_block<T>>(1);
             cb->ref_count.store(1);
@@ -51,6 +72,58 @@ namespace std {
                 .ptr = ptr,
             };
         }
+        //! Returns a const pointer to the shared value. Unsafe function, and only temporary until references are added back to Atlas77.
+        //!
+        //! The pointer is only valid as long as at least one `std::shared_ptr` to the value is alive.
+        fun get(*const this) -> *const T {
+            return this->ptr;
+        }
+        //! Returns a mutable pointer to the shared value. Unsafe function, and only temporary until references are added back to Atlas77.
+        //!
+        //! The pointer is only valid as long as at least one `std::shared_ptr` to the value is alive.
+        fun get_mut(*const this) -> *T {
+            return this->ptr;
+        }
+        //! Returns true if this `std::shared_ptr` doesn't point to anything.
+        fun is_null(*const this) -> bool {
+            return this->ptr == null || this->cb == null;
+        }
+        //! Returns the number of `std::shared_ptr` currently owning the value, or `0` if this one is null.
+        fun use_count(*const this) -> int64 {
+            if this->cb == null { return 0; }
+            return this->cb->ref_count.load();
+        }
+        //! `*ptr` returns a copy of the shared value. Only available for `std::trivially_copyable` types.
+        operator deref(*const this) -> T where T: std::trivially_copyable {
+            return *this->ptr;
+        }
+        //! `!ptr` returns true if the pointer isn't null.
+        //!
+        //! NB: The naming is confusing, it doesn't negate anything. It will probably change.
+        operator not(*const this) -> bool {
+            return this->ptr != null;
+        }
+        //! Two `std::shared_ptr` are equal if the values they point to are equal, not if they point to the same allocation.
+        operator equal(*const this, other: *const std::shared_ptr<T>) -> bool 
+            where T: operator::equal
+        {
+            return *this->ptr == *other->ptr;
+        }
+        //! Creates a `std::weak_ptr` observing the same value. See `std::weak_ptr` for why you shouldn't use it yet.
+        fun get_weak(*this) -> std::weak_ptr<T> {
+            this->cb->weak_count.fetch_add(1);
+            return std::weak_ptr<T> {
+                .cb = this->cb,
+                .ptr = this->ptr,
+            };
+        }
+    }
+
+    //! Copying a `std::shared_ptr` doesn't copy the value, it adds a new owner: the reference count is incremented.
+    extend std::shared_ptr<T> with std::copyable {
+        //! Returns a new `std::shared_ptr` to the same value and increments the reference count.
+        //!
+        //! Panics if the control block is null, which shouldn't happen.
         fun copy(*const this) -> std::shared_ptr<T> {
             if this->cb == null {
                 std::panic("std::shared_ptr control block is null for some reason");
@@ -61,48 +134,19 @@ namespace std {
                 .ptr = this->ptr,
             };
         }
-        //! Unsafe function, and only temporary until references are added back to Atlas77
-        fun get(*const this) -> *const T {
-            return this->ptr;
-        }
-        //! Unsafe function, and only temporary until references are added back to Atlas77
-        fun get_mut(*const this) -> *T {
-            return this->ptr;
-        }
-        fun is_null(*const this) -> bool {
-            return this->ptr == null || this->cb == null;
-        }
-        fun use_count(*const this) -> int64 {
-            if this->cb == null { return 0; }
-            return this->cb->ref_count.load();
-        }
-        operator deref(*const this) -> T where T: std::trivially_copyable {
-            return *this->ptr;
-        }
-        operator not(*const this) -> bool {
-            return this->ptr != null;
-        }
-        operator equal(*const this, other: *const std::shared_ptr<T>) -> bool 
-            where T: operator::equal
-        {
-            return *this->ptr == *other->ptr;
-        }
-        fun get_weak(*this) -> std::weak_ptr<T> {
-            this->cb->weak_count.fetch_add(1);
-            return std::weak_ptr<T> {
-                .cb = this->cb,
-                .ptr = this->ptr,
-            };
-        }
     }
 
-    //! NB: Not properly implemented just yet...
+    //! Not really implemented. This type doesn't work and should **NOT** be used at any cost rn.
+    //!
+    //! The idea is the usual one: a non owning observer of a `std::shared_ptr` value, which can tell whether
+    //! the value is still alive without keeping it alive. None of that exists yet.
     public struct weak_ptr<T> {
       private:
         cb: std::__control_block<T>;
         ptr: *T;
 
       public:
+        //! Doesn't return anything yet. Don't call it.
         fun copy(*this) -> std::weak_ptr<T> {
             if this->cb == null {
                 std::panic("std::weak_ptr control block is null for some reason");

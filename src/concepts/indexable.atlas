@@ -1,8 +1,25 @@
+//! `std::indexable`: looking a container up by index or key, as done by `std::vector<T>` and `std::map<K, V>`.
+
 namespace std {
+    //! Containers that can be looked up by an index (or a key), giving back a pointer to the stored value.
+    //!
+    //! `std::vector<T>` indexes with a `uint64` and panics out of bounds, `std::map<K, V>` indexes with a `K`
+    //! and returns `null` when the key is missing. What happens on a bad index is up to the implementor.
+    //!
+    //! ```
+    //! let v = std::vector<int64>::with_capacity(1);
+    //! v.push(42);
+    //! let first: *const int64 = v.get(0);
+    //! *v.get_mut(0) = 43;
+    //! ```
     public concept indexable {
+        //! The type used to index the container.
         type index_t;
+        //! The type of the values stored in the container.
         type index_val_t;
+        //! Returns a const pointer to the value at `idx`.
         fun get(*const this, idx: This::index_t) -> *const This::index_val_t;
+        //! Returns a mutable pointer to the value at `idx`.
         fun get_mut(*this, idx: This::index_t) -> *This::index_val_t;
         // TODO: Add operator index(*this, idx: This::index_t) -> *This::index_val_t
         // TODO: Add operator index_equal(*this, idx: This::index_t, val: This::index_val_t)

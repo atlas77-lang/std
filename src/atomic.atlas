@@ -1,3 +1,8 @@
+//! Atomic operations. A thin wrapper around the C11 `<stdatomic.h>` functions.
+//!
+//! Only `std::primitive` types can be made atomic for now. Every operation exists in two flavours:
+//! the plain one, which is sequentially consistent, and the `_explicit` one which takes a `MEMORY_ORDERING`.
+
 import "concepts/primitive.atlas";
 
 private extern fun atomic_init<T: std::primitive>(obj: *__atomic T, val: T);
@@ -42,8 +47,21 @@ private extern fun atomic_flag_test_and_set_explicit(obj: *atomic_flag, order: M
 private extern fun atomic_flag_clear(obj: *atomic_flag);
 private extern fun atomic_flag_clear_explicit(obj: *atomic_flag, order: MEMORY_ORDERING);
 
+//! Turns a plain `T` value into an `__atomic T`. Maps directly to the C11 macro of the same name.
+//!
+//! As of the v0.9, it's not possible to initialize an `__atomic T` value with a simple `T` value.
+//! This function is a cheap work around that known limitation of the atlas77 compiler. It will be fixed
+//! at one point: you will be able to assign a `T` to an `__atomic T`, but it would require either
+//! a copy or a move of the original `T` value.
 public extern fun ATOMIC_VAR_INIT<T: std::primitive>(value: T) -> __atomic T;
 
+//! Memory ordering constraints for the `_explicit` operations. Same meaning and same values as the C11 `memory_order` enum.
+//!
+//! - `RELAXED`: no ordering constraint, only atomicity.
+//! - `CONSUME`/`ACQUIRE`: reads after this load can't be reordered before it.
+//! - `RELEASE`: writes before this store can't be reordered after it.
+//! - `ACQUIRE_RELEASE`: both of the above, for read-modify-write operations.
+//! - `SEQUENTIALLY_CONSISTENT`: the strongest one, and the default used by the non `_explicit` methods.
 private enum MEMORY_ORDERING {
     RELAXED = 0;
     CONSUME = 1;
@@ -55,45 +73,77 @@ private enum MEMORY_ORDERING {
 
 namespace std {
     #[std::non_copyable]
+    //! Wrapper around an `__atomic T` type. Only allows primitive types for now. 
+    //! > **NB:** It's a relatively annoying limitation that will be lifted at one point.
+    //! 
+    //! This type has been added mostly for convenience as a wrapper around the primitive C11 functions.
+    //! It is `#[std::non_copyable]`: share it through a pointer (or a `std::shared_ptr`) instead.
+    //!
+    //! ```
+    //! let counter = std::atomic<int64>::new(0);
+    //! counter.fetch_add(1);
+    //! let value = counter.load(); // 1
+    //! ```
     public struct atomic<T: std::primitive> {
       private:
         value: __atomic T;
       public:
+        //! Creates a new atomic holding `val`.
         fun new(val: T) -> std::atomic<T> {
             return std::atomic<T>{ .value = ATOMIC_VAR_INIT(val) };
         }
 
+        //! Atomically reads the current value.
         fun load(*const this) -> T {
             return atomic_load(&this->value);
         }
+        //! Atomically reads the current value with the given memory ordering.
         fun load_explicit(*const this, order: MEMORY_ORDERING) -> T {
             return atomic_load_explicit(&this->value, order);
         }
+        //! Atomically replaces the current value with `val`.
         fun store(*this, val: T) {
             atomic_store(&this->value, val);
         }
+        //! Atomically replaces the current value with `val` with the given memory ordering.
         fun store_explicit(*this, val: T, order: MEMORY_ORDERING) {
             atomic_store_explicit(&this->value, val, order);
         }
+        //! Atomically replaces the current value with `val` and returns the previous one.
         fun exchange(*this, val: T) -> T {
             return atomic_exchange(&this->value, val);
         }
+        //! Atomically replaces the current value with `val` and returns the previous one, with the given memory ordering.
         fun exchange_explicit(*this, val: T, order: MEMORY_ORDERING) -> T {
             return atomic_exchange_explicit(&this->value, val, order);
         }
+        //! Returns true if operations on this atomic don't need a lock on the current platform.
         fun is_lock_free(*const this) -> bool {
             return atomic_is_lock_free(&this->value);
         }
 
+        //! If the current value is equal to `*expected`, replaces it with `desired` and returns true.
+        //! Otherwise, writes the current value into `*expected` and returns false.
+        //!
+        //! The strong version never fails spuriously, use it when you don't want to loop.
         fun compare_exchange_strong(*this, expected: *T, desired: T) -> bool {
             return atomic_compare_exchange_strong(&this->value, expected, desired);
         }
+        //! Same as `compare_exchange_strong` with the given memory ordering.
+        //!
+        //! NB: The C11 function takes a success and a failure ordering, here `order` is passed for both.
         fun compare_exchange_strong_explicit(*this, expected: *T, desired: T, order: MEMORY_ORDERING) -> bool {
             return atomic_compare_exchange_strong_explicit(&this->value, expected, desired, order);
         }
+        //! If the current value is equal to `*expected`, replaces it with `desired` and returns true.
+        //! Otherwise, writes the current value into `*expected` and returns false.
+        //!
+        //! The weak version may fail spuriously (return false even though the values were equal),
+        //! but can be cheaper on some platforms. Use it inside a loop.
         fun compare_exchange_weak(*this, expected: *T, desired: T) -> bool {
             return atomic_compare_exchange_weak(&this->value, expected, desired);
         }
+        //! Same as `compare_exchange_weak` with a memory ordering for the success and the failure case.
         fun compare_exchange_weak_explicit(
             *this, 
             expected: *T, 
@@ -112,56 +162,66 @@ namespace std {
         // Potentially Add `Where T: Primitive` to this section to ensure "atomic_fetch_add" is not misused
         // At least temporarily
 
+        //! Atomically adds `val` to the current value and returns the previous value.
         // Should be "where T: AddAssign" but it doesn't exist yet
         fun fetch_add(*this, val: T) -> T
             where T: operator::add 
         {
             return atomic_fetch_add(&this->value, val);
         }
+        //! Atomically adds `val` to the current value and returns the previous value, with the given memory ordering.
         fun fetch_add_explicit(*this, val: T, order: MEMORY_ORDERING) -> T
             where T: operator::add 
         {
             return atomic_fetch_add_explicit(&this->value, val, order);
         }
+        //! Atomically subtracts `val` from the current value and returns the previous value.
         // Should be "where T: SubAssign" but it doesn't exist yet
         fun fetch_sub(*this, val: T) -> T
             where T: operator::sub 
         {
             return atomic_fetch_sub(&this->value, val);
         }
+        //! Atomically subtracts `val` from the current value and returns the previous value, with the given memory ordering.
         fun fetch_sub_explicit(*this, val: T, order: MEMORY_ORDERING) -> T
             where T: operator::sub 
         {
             return atomic_fetch_sub_explicit(&this->value, val, order);
         }
+        //! Atomically does a bitwise OR of the current value with `val` and returns the previous value.
         // Should be "where T: OrAssign" but it doesn't exist yet
         fun fetch_or(*this, val: T) -> T
             where T: operator::bin_or 
         {
             return atomic_fetch_or(&this->value, val);
         }
+        //! Atomically does a bitwise OR of the current value with `val` and returns the previous value, with the given memory ordering.
         fun fetch_or_explicit(*this, val: T, order: MEMORY_ORDERING) -> T
             where T: operator::bin_or 
         {
             return atomic_fetch_or_explicit(&this->value, val, order);
         }
+        //! Atomically does a bitwise AND of the current value with `val` and returns the previous value.
         // Should be "where T: AndAssign" but it doesn't exist yet
         fun fetch_and(*this, val: T) -> T
             where T: operator::bin_and 
         {
             return atomic_fetch_and(&this->value, val);
         }
+        //! Atomically does a bitwise AND of the current value with `val` and returns the previous value, with the given memory ordering.
         fun fetch_and_explicit(*this, val: T, order: MEMORY_ORDERING) -> T
             where T: operator::bin_and 
         {
             return atomic_fetch_and_explicit(&this->value, val, order);
         }
+        //! Atomically does a bitwise XOR of the current value with `val` and returns the previous value.
         // Should be "where T: XorAssign" but it doesn't exist yet
         fun fetch_xor(*this, val: T) -> T
             where T: operator::bin_xor 
         {
             return atomic_fetch_xor(&this->value, val);
         }
+        //! Atomically does a bitwise XOR of the current value with `val` and returns the previous value, with the given memory ordering.
         fun fetch_xor_explicit(*this, val: T, order: MEMORY_ORDERING) -> T
             where T: operator::bin_xor 
         {

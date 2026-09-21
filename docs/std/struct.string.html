@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,13 +145,20 @@
 <h1><span class="kind">Struct</span> std::string</h1>
 <pre class="code">struct std::string</pre>
 <p class="source">Declared in <a href="../files/src-string.atlas.html">src/string.atlas</a></p>
-<p>Bootiful std::string type</p>
+<p>Owned, growable, null terminated byte string.</p>
+<p>The buffer is always null terminated, so <code>c_str()</code> can be handed to any C function at no cost.
+Methods returning a <code>std::string</code> always return a fresh allocation, never a view into <code>this</code>.</p>
+<pre><code>let s = std::string::from_chars("Hello");
+s.push_str(", World!");
+std::println(s.c_str() as str);
+</code></pre>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.c_str">
 <pre class="code">fun c_str(*const this) -&gt; *const uint8 </pre>
 <p>Returns a pointer to the string’s data. Always valid, always
-NUL-terminated at <code>data[len]</code> – a plain accessor, nothing more.</p>
+NUL-terminated at <code>data[len]</code>, a plain accessor, nothing more.</p>
+<p>The pointer is only valid until the next mutation of the string.</p>
 </div>
 <div class="member" id="method.capacity">
 <pre class="code">fun capacity(*const this) -&gt; uint64 </pre>
@@ -164,13 +171,16 @@ NUL-terminated at <code>data[len]</code> – a plain accessor, nothing more.</p>
 </div>
 <div class="member" id="method.copy">
 <pre class="code">fun copy(*const this) -&gt; std::string </pre>
+<p>Returns an independent copy of this string, with the same content and capacity.</p>
 </div>
 <div class="member" id="method.default">
 <pre class="code">fun default() -&gt; std::string </pre>
+<p>Creates an empty string. Same as <code>new()</code>, exists to satisfy <code>std::default</code>.</p>
 </div>
 <div class="member" id="method.from_chars">
 <pre class="code">fun from_chars(s_: *const uint8) -&gt; std::string </pre>
 <p>Creates a new <code>std::string</code> from a null-terminated C string.</p>
+<p>The bytes are copied, the string doesn’t keep a reference to <code>s_</code>.</p>
 </div>
 <div class="member" id="method.is_empty">
 <pre class="code">fun is_empty(*const this) -&gt; bool </pre>
@@ -178,55 +188,67 @@ NUL-terminated at <code>data[len]</code> – a plain accessor, nothing more.</p>
 </div>
 <div class="member" id="method.is_whitespace">
 <pre class="code">fun is_whitespace(c: uint8) -&gt; bool </pre>
+<p>Returns true if <code>c</code> is a space, a tab, a newline or a carriage return.</p>
 </div>
 <div class="member" id="method.len">
 <pre class="code">fun len(*const this) -&gt; uint64 </pre>
-<p>Returns the length of the string.</p>
+<p>Returns the length of the string, in bytes, not counting the terminator.</p>
 </div>
 <div class="member" id="method.new">
 <pre class="code">fun new() -&gt; std::string </pre>
+<p>Creates an empty string. It still allocates a single byte for the terminator.</p>
 </div>
 <div class="member" id="method.push_char">
 <pre class="code">fun push_char(*this, ch: char) -&gt; unit </pre>
 <p>Appends a single char to the end of this string.</p>
+<p>Grows the buffer if needed.</p>
 </div>
 <div class="member" id="method.push_str">
 <pre class="code">fun push_str(*this, s: *const uint8) -&gt; unit </pre>
 <p>Appends a string slice to the end of this string.</p>
+<p><code>s</code> must be null terminated. Grows the buffer if needed.</p>
 </div>
 <div class="member" id="method.substr">
 <pre class="code">fun substr(*const this, start: uint64, end: uint64) -&gt; std::string </pre>
+<p>Returns a new <code>std::string</code> holding the bytes in <code>[start, end)</code>.</p>
+<p>Panics if <code>start &gt; end</code> or if <code>end</code> is past the end of the string.</p>
 </div>
 <div class="member" id="method.to_chars">
 <pre class="code">fun to_chars(*const this) -&gt; *const uint8 </pre>
-<p>Returns a string slice</p>
+<p>Returns a string slice. Same as <code>c_str()</code>.</p>
 </div>
 <div class="member" id="method.to_lower">
 <pre class="code">fun to_lower(*const this) -&gt; std::string </pre>
-<p>Returns a new <code>std::string</code> converted to lowercase.</p>
+<p>Returns a new <code>std::string</code> converted to lowercase. Only ASCII letters are affected.</p>
 </div>
 <div class="member" id="method.to_string">
 <pre class="code">fun to_string(val: T) -&gt; std::string </pre>
+<p>Formats a primitive value into a new <code>std::string</code>.</p>
+<p>Integers, floats, <code>char</code> and <code>bool</code> are supported. The formatting goes through <code>libc::snprintf</code>,
+so floats are printed the way C’s <code>%f</code> prints them. <code>str</code> isn’t supported yet, use <code>from_chars</code> instead.
+Prefer <code>value.to_string()</code> through the <code>std::to_string</code> concept, which calls this for you.</p>
 </div>
 <div class="member" id="method.to_upper">
 <pre class="code">fun to_upper(*const this) -&gt; std::string </pre>
-<p>Returns a new <code>std::string</code> converted to uppercase.</p>
+<p>Returns a new <code>std::string</code> converted to uppercase. Only ASCII letters are affected.</p>
 </div>
 <div class="member" id="method.trim">
 <pre class="code">fun trim(*const this) -&gt; std::string </pre>
 <p>Returns a new <code>std::string</code> with leading and trailing whitespace removed.
-Always an independent allocation – never a view into <code>this</code>,
+Always an independent allocation, never a view into <code>this</code>,
 so it owns its own terminator and its own lifetime.</p>
 </div>
 <div class="member" id="method.with_capacity">
 <pre class="code">fun with_capacity(capacity: uint64) -&gt; std::string </pre>
 <p>Creates a new <code>std::string</code> with the specified capacity.</p>
+<p>The string is empty, <code>capacity</code> only tells how many bytes can be pushed before a reallocation happens.</p>
 </div>
 </section>
 <section>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~string()</pre>
+<p>Frees the underlying buffer.</p>
 </div>
 </section>
 </main>

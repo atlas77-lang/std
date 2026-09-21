@@ -1,3 +1,7 @@
+//! File system access. Reading and writing files, and iterating over the entries of a directory.
+//!
+//! Every fallible operation returns a `std::expected<_, std::string>` where the error is a human readable message.
+
 import "optional.atlas";
 import "expected.atlas";
 import "memory.atlas";
@@ -5,18 +9,35 @@ import "string.atlas";
 import "libc.atlas";
 
 namespace std {
+    //! How a file should be opened. Maps to the C `fopen` mode strings.
     public enum FILE_MODE {
+        //! Read only, the file must exist (`"r"`)
         READ;
+        //! Write only, the file is created or truncated (`"w"`)
         WRITE;
+        //! Write only, at the end of the file, which is created if needed (`"a"`)
         APPEND;
+        //! Read and write, the file must exist (`"r+"`)
         READ_WRITE;
     }
 
+    //! An open file. Wrapper around a C `FILE*` that closes itself when destroyed.
+    //!
+    //! ```
+    //! let res = std::file::open("foo.txt");
+    //! if res.is_expected() {
+    //!     let f = res.expected_value();
+    //!     let content = f.read_all();
+    //! }
+    //! ```
+    //!
+    //! For the common "read the whole thing" case, `std::file::read_to_string(path)` does all of the above in one go.
     public struct file {
     private:
         handle: *libc::FILE;
 
     public:
+        //! Closes the file if it's still open.
         ~file() {
             if this->handle != null {
                 libc::fclose(this->handle);
@@ -25,6 +46,8 @@ namespace std {
         }
 
         //! Open file with explicit mode flag.
+        //!
+        //! On failure, the error is the message matching the C `errno`.
         fun open_with_mode(path: *const uint8, mode: std::FILE_MODE) -> std::expected<std::file, std::string> {
             let mode_str: *const uint8 = "r";
             if mode == std::FILE_MODE::WRITE {
@@ -56,6 +79,7 @@ namespace std {
             return std::file::open_with_mode(path, std::FILE_MODE::WRITE);
         }
 
+        //! Returns true if the file at `path` exists and can be opened for reading.
         fun exists(path: *const uint8) -> bool {
             let result = libc::fopen(path, "rb");
 
@@ -79,6 +103,8 @@ namespace std {
         }
 
         //! Read the full content of an opened file handle into a std::string.
+        //!
+        //! The file is read from its start, whatever the current position was.
         fun read_all(*this) -> std::expected<std::string, std::string> {
             if this->handle == null {
                 return std::expected<std::string, std::string>::unexpected(
@@ -125,6 +151,8 @@ namespace std {
         }
 
         //! Write raw byte buffer to file.
+        //!
+        //! Returns the number of bytes written, or an error if fewer than `size` bytes could be written.
         fun write(*this, buf: *const uint8, size: uint64) -> std::expected<uint64, std::string> {
             if this->handle == null {
                 return std::expected<uint64, std::string>::unexpected(
@@ -143,11 +171,15 @@ namespace std {
         }
 
         //! Write an entire string to file.
+        //!
+        //! Returns the number of bytes written.
         fun write_all(*this, str_val: *const std::string) -> std::expected<uint64, std::string> {
             return this->write(str_val->c_str(), str_val->len());
         }
 
         //! Flush buffered file streams.
+        //!
+        //! Returns true on success, false if the file isn't open or the flush failed.
         fun flush(*this) -> bool {
             if this->handle == null {
                 return false;
@@ -156,20 +188,40 @@ namespace std {
         }
 
         //! Obtain direct access to underlying opaque C file handle.
+        //!
+        //! The `std::file` still owns the handle and will close it, don't `fclose` it yourself.
         fun get_handle(*this) -> *libc::FILE {
             return this->handle;
         }
     }
 
+    //! Opens the directory at `path` for iteration. Returns `null` on failure. Prefer `std::directory::open`.
     #[c_name("atlas_directory_open")]
     public extern fun atlas_directory_open(path: *const uint8) -> *unit;
 
+    //! Returns the name of the next entry of the directory, or `null` once exhausted. Prefer `std::directory::next`.
     #[c_name("atlas_directory_next")]
     public extern fun atlas_directory_next(handle: *unit) -> *const uint8;
 
+    //! Closes a directory handle obtained from `atlas_directory_open`.
     #[c_name("atlas_directory_close")]
     public extern fun atlas_directory_close(handle: *unit);
 
+    //! An open directory, iterated entry by entry with `next()`.
+    //!
+    //! ```
+    //! let res = std::directory::open(".");
+    //! if res.is_expected() {
+    //!     let dir = res.expected_value();
+    //!     let entry = dir.next();
+    //!     while entry.has_value() {
+    //!         std::println(entry.value().c_str() as str);
+    //!         entry = dir.next();
+    //!     }
+    //! }
+    //! ```
+    //!
+    //! NB: `.` and `..` are returned like any other entry. The order of the entries is whatever the OS gives.
     public struct directory {
       private:
         handle: *unit;
@@ -213,6 +265,7 @@ namespace std {
 
             return std::optional<std::string>::of(std::string::from_chars(name));
         }
+        //! Closes the directory if it's still open.
         ~directory() {
             if this->handle != null {
                 std::atlas_directory_close(
@@ -224,4 +277,3 @@ namespace std {
         }
     }
 }
-

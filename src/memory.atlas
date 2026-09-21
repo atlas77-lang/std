@@ -1,8 +1,22 @@
+//! Low-level memory helpers: allocation, moves, raw pointer reads/writes and the `size_of`/`align_of` intrinsics.
+//!
+//! Most of the containers of the std (`std::vector<T>`, `std::map<K, V>`, `std::shared_ptr<T>`...) are built on top
+//! of the functions declared here. They are thin wrappers around the libc allocator and a handful of compiler intrinsics.
+//!
+//! > **NB**: Everything in here is unsafe by nature. Nothing checks that the pointers you hand over are valid.
+
 namespace std {
+    //! Allocates enough uninitialized memory for a single `T` and returns a pointer to it.
+    //!
+    //! The memory is **not** zeroed, use `std::zero_alloc<T>(1)` if you need that.
+    //! The returned pointer must be released with `libc::free`.
     public fun alloc<T>() -> *T
     {
         return libc::malloc<T>(size_of<T>());
     }
+    //! Allocates a zeroed buffer able to hold `nelem` values of type `T` and returns a pointer to its start.
+    //!
+    //! Maps directly to `libc::calloc`. The returned pointer must be released with `libc::free`.
     public fun zero_alloc<T>(nelem: uint64) -> *T
     {
         return libc::calloc<T>(nelem, size_of<T>());
@@ -13,33 +27,30 @@ namespace std {
     //! [!Note] This is a low-level primitive and should be used with care.
     public extern fun move<T>(from: T) -> T;
 
-    public fun take<T: std::default>(from: *T) -> T
-    {
+    //! Takes the value behind `from` and leaves `T::default()` in its place.
+    //!
+    //! Useful when you need to move a value out of a struct field without leaving it in an invalid state.
+    //! The type has to implement `std::default` so that something valid can be written back.
+    public fun take<T: std::default>(from: *T) -> T {
         let val = std::ptr::read(from);
         std::ptr::write(from, T::default());
         // We move it to ensure no issues, but tbf, it should work without `std::move`
         return std::move(val);
     }
 
-    // Type that are `std::trivially_copyable` are always `std::copyable`,
-    // though it doesn't guarantee to have a `.copy()` method.
-    public fun copy<T: std::copyable>(from: *const T) -> T
-    {
-        return from.copy();
-        // TODO: This should support std::trivially_copyable types, with something akin to:
-        // when typeof(T).is_trivially_copyable {
-        //     return *T;
-        // else {
-        //    return from.copy();
-        //}
-    }
-
+    //! Raw pointer primitives. Reading and writing through a pointer without running any destructor.
     namespace ptr {
         #[core::intrinsic]
+        //! Reads the value behind `ptr` as a bitwise copy, without invalidating what's behind the pointer.
+        //!
+        //! No destructor is run for the source, which means you're now responsible for making sure
+        //! the value isn't dropped twice.
         public extern fun read<T>(ptr: *T) -> T;
         #[core::intrinsic]
+        //! Writes `val` behind `ptr` as a bitwise copy, without running the destructor of the previous value.
         public extern fun write<T>(ptr: *T, val: T);
 
+        //! Swaps the two values behind `a` and `b` in place.
         public fun swap<T>(a: *T, b: *T) {
             let temp = std::ptr::read(a);
             std::ptr::write(a, std::ptr::read(b));
@@ -57,8 +68,10 @@ namespace std {
 }
 
 #[core::intrinsic]
+//! Returns the size of `T` in bytes, as the C compiler sees it.
 public extern fun size_of<T>() -> uint64;
 #[core::intrinsic]
+//! Returns the alignment of `T` in bytes, as the C compiler sees it.
 public extern fun align_of<T>() -> uint64;
 //! For the people who can't add a little underscore...
 public fun sizeof<T>() -> uint64
@@ -72,5 +85,7 @@ public fun alignof<T>() -> uint64
     return align_of<T>();
 }
 
+//! Returns the C error message matching the given error code. Same as `libc::str_error`, kept at the top level for convenience.
 public extern fun strerror(code: uint64) -> *const uint8;
+//! Returns the current value of the C `errno`. Same as `libc::errno`, kept at the top level for convenience.
 public extern fun c_errno() -> uint64;

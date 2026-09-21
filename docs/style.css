@@ -135,7 +135,7 @@ pre.code {
     border-left: 2px solid var(--border);
 }
 
-.member > p:last-child {
+.member>p:last-child {
     margin-bottom: 0;
 }
 

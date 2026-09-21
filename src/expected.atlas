@@ -1,3 +1,7 @@
+//! Error handling without exceptions. `std::expected<T, E>` holds either a value or an error.
+//!
+//! This is the type most of the std uses to report failures (e.g. `std::file::open`, `std::any::cast<T>()`).
+
 import "io.atlas";
 import "memory.atlas";
 
@@ -19,12 +23,23 @@ namespace std {
     //! - Query with `is_expected()` / `is_unexpected()`.
     //! - Access with `expected_value()` / `unexpected_value()` or use
     //!   `expected_value_or(default)`.
+    //! - Every accessor consumes the expected: once you took the value (or the error) out, the destructor won't touch it.
+    //!
+    //! ```
+    //! let res = std::file::read_to_string("foo.txt");
+    //! if res.is_unexpected() {
+    //!     let err: std::string = res.unexpected_value();
+    //! } else {
+    //!     let content: std::string = res.expected_value();
+    //! }
+    //! ```
     public struct expected<T, E> {
     private:
         data: std::__expected_storage<T, E>;
         has_expected_value: bool;
         is_empty: bool; // Track if the expected is in an empty state (neither value is present)
     public:
+        //! Drops whichever of the value or the error is still held. Does nothing if it has already been taken out.
         ~expected() {
             if (!this->is_empty) {
                 if (this->has_expected_value) {
@@ -36,8 +51,9 @@ namespace std {
         }
         //! Construct a successful `expected` containing `data`.
         //!
-        //! Example:
-        //!     let e = std::expected<int64, string>::expect(42);
+        //! ```
+        //! let e = std::expected<int64, std::string>::expect(42);
+        //! ```
         fun expect(data: T) -> std::expected<T, E> {
             return std::expected<T, E> {
                     .data = std::__expected_storage<T, E> { 
@@ -49,8 +65,9 @@ namespace std {
         }
         //! Construct a failing `expected` containing `error`.
         //!
-        //! Example:
-        //!     let e = std::expected<int64, string>::unexpected("oops");
+        //! ```
+        //! let e = std::expected<int64, std::string>::unexpected(std::string::from_chars("oops"));
+        //! ```
         fun unexpected(error: E) -> std::expected<T, E> {
             return std::expected<T, E> {
                 .data = std::__expected_storage<T, E> { 
@@ -114,10 +131,16 @@ namespace std {
             }
         }
 
+        //! `!res` returns true if this holds an expected value. Same as `is_expected()`.
+        //!
+        //! NB: The naming is confusing, it doesn't negate anything. It will probably change.
         operator not(*const this) -> bool {
             return this->is_expected();
         }
 
+        //! `*res` consumes the expected and returns the contained value. Panics if this is an unexpected error.
+        //!
+        //! Same behaviour as `expected_value()`.
         operator deref(*this) -> T {
             if (!this->has_expected_value) {
                 std::panic("called operator deref on an unexpected error");

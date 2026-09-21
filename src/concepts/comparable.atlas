@@ -1,28 +1,61 @@
+//! `std::comparable` and `std::ordering`: total ordering, with every comparison operator derived from a single `compare` method.
+
 namespace std {
+    //! Result of a comparison between two values: `LESS`, `EQUAL` or `GREATER`.
+    //!
+    //! The values of the variants allow for fun optimization. 
+    //! Most primitive types implement the `std::comparable::compare` method like this:
+    //! `return ((*this > *other) as int32 - (*this < *other) as int32) as uint64`
+    //! which gives `-1`, `0` or `1` without a single branch.
     public enum ordering {
-        // -1
+        //! Represent the less variant (its actual value is -1)
         LESS = 0xFFFFFFFFFFFFFFFFu;
+        //! Represent the equal variant
         EQUAL = 0;
+        //! Represent the greater variant
         GREATER = 1;
     }
-    // TODO: Make all primitive type actually use those overloaded operators, 
-    // but using some kind of __intrinsic_add(a, b)/__intrinsic_equal(a, b)
-    // So that EVERY operators are just a function call, up until a primitive type
+    //! Types with a total order. Implement `compare` and every comparison operator comes for free.
+    //!
+    //! ```
+    //! extend my_type with std::comparable {
+    //!     fun compare(*const this, other: *const This) -> std::ordering {
+    //!         return this->key.compare(&other->key);
+    //!     }
+    //! }
+    //! // a < b, a == b, a >= b... now all work
+    //! ```
+    //!
+    //! TODO: Make all primitive type actually use those overloaded operators, 
+    //! but using some kind of `__intrinsic_add(a, b)`/`__intrinsic_equal(a, b)`
+    //! So that EVERY operators are just a function call, up until a primitive type
     public concept comparable {
+        //! The only method that should get implemented. Returns how `this` compares to `other`.
+        //! Allows to auto implement all the linked operators
+        //! (equal/not_equal/greater/greater_equal/less/less_equal) automatically.
         fun compare(*const this, other: *const This) -> std::ordering;
+        //! `a == b`, true if `compare` returns `EQUAL`
         operator equal(*const this, other: *const This) -> bool {
             return this.compare(other) == std::ordering::EQUAL;
         }
+        //! `a != b`, true if `compare` doesn't return `EQUAL`
+        operator not_equal(*const this, other: *const This) -> bool {
+            return this.compare(other) != std::ordering::EQUAL;
+        }
+        //! `a < b`, true if `compare` returns `LESS`
         operator less(*const this, other: *const This) -> bool {
             return this.compare(other) == std::ordering::LESS;
         }
+        //! `a <= b`, true if `compare` returns `LESS` or `EQUAL`
         operator less_equal(*const this, other: *const This) -> bool {
             let res = this.compare(other);
             return res == std::ordering::LESS || res == std::ordering::EQUAL;
         }
+        //! `a > b`, true if `compare` returns `GREATER`
         operator greater(*const this, other: *const This) -> bool {
             return this.compare(other) == std::ordering::GREATER;
         }
+        //! `a >= b`, true if `compare` returns `GREATER` or `EQUAL`
         operator greater_equal(*const this, other: *const This) -> bool {
             let res = this.compare(other);
             return res == std::ordering::GREATER || res == std::ordering::EQUAL;

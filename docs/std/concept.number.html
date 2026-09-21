@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,13 +145,20 @@
 <h1><span class="kind">Concept</span> std::number</h1>
 <pre class="code">concept std::number</pre>
 <p class="source">Declared in <a href="../files/src-concepts-number.atlas.html">src/concepts/number.atlas</a></p>
+<p>Numeric types with a known range. Gives access to the smallest and largest value of the type.</p>
+<pre><code>let biggest = int32::MAX(); // 2147483647
+let smallest = uint8::MIN(); // 0
+</code></pre>
+<p>NB: For the floats, <code>MIN()</code> is the smallest positive subnormal value, not the most negative one, like C’s <code>FLT_MIN</code>.</p>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.max">
 <pre class="code">fun MAX() -&gt; This </pre>
+<p>Largest value representable by the type.</p>
 </div>
 <div class="member" id="method.min">
 <pre class="code">fun MIN() -&gt; This </pre>
+<p>Smallest value representable by the type (smallest positive one for floats).</p>
 </div>
 </section>
 <section>

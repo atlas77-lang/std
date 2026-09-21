@@ -1,5 +1,17 @@
+//! `std::default`: the "zero" value of a type, through `T::default()`.
+
 namespace std {
+    //! Types that have a sensible "zero" value, obtained through `T::default()`.
+    //!
+    //! Numbers default to `0`, `bool` to `false`, `char` to `'\0'`, `str` to `""` and every pointer type to `null`.
+    //! Needed by `std::take<T>()`, which has to leave something valid behind once it took the value out.
+    //!
+    //! ```
+    //! let n = int64::default(); // 0
+    //! let s = std::string::default(); // ""
+    //! ```
     public concept default {
+        //! Returns the default value of the type.
         fun default() -> This;
     }
     extend *T with std::default {

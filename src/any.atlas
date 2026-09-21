@@ -1,14 +1,30 @@
+//! Type erasure. `std::any` can hold a value of any type and give it back to you later, as long as you ask for the right type.
+
 import "reflection.atlas";
 import "memory.atlas";
 import "expected.atlas";
 import "libc.atlas";
 
 namespace std {
-    enum cast_error {
+    //! Error cases for the `std::any` struct. Tells you why `std::any::get<T>()`, `get_mut<T>()` or `cast<T>()` failed.
+    public enum cast_error {
+        //! The `std::any` holds a `U`, but you asked for a `T`. The two types have to be exactly the same, no conversion is attempted.
         UNEQUIVALENT_CAST;
+        //! The value has already been taken out of this `std::any` through `cast<T>()`, there is nothing left to give.
         MOVED_ANY_VALUE;
     }
 
+    //! A type erased container. It holds a single value of any type `T`, and only gives it back if you ask for that exact `T`.
+    //!
+    //! The value is boxed on the heap, and the `std::any` remembers both its `core::type_info` and its destructor,
+    //! so it can be checked and destroyed properly without knowing `T` anymore.
+    //!
+    //! ```
+    //! let a = std::any::new<int64>(42);
+    //! let wrong = a.get<bool>();  // unexpected(UNEQUIVALENT_CAST)
+    //! let right = a.get<int64>(); // expect(*const int64)
+    //! let owned = a.cast<int64>(); // 42, a is now empty
+    //! ```
     public struct any {
       private:
         val: *unit;
@@ -16,6 +32,12 @@ namespace std {
         deleter: fun(*unit) -> unit;
 
       public:
+        //! Destroys then frees the contained value, if there is still one, using the destructor stored at construction time.
+        //!
+        //! `std::any` can't call `delete` on a `*unit`, so `new<T>()` stores `std::deleter<T>` and this calls it back.
+        //!
+        //! NB: It should be possible to directly store the destructor directly using `value.~T` or something like that.
+        //! Maybe renaming the destructor with a special case `drop()` method.
         ~any() {
             if this->val != null {
                 this->deleter(this->val);
@@ -23,6 +45,7 @@ namespace std {
             }
         }
 
+        //! Creates a new `std::any` holding `value`. The value is moved into a heap allocation owned by the `std::any`.
         fun new<T>(value: T) -> std::any {
             let ptr = std::zero_alloc<T>(1);
             *ptr = std::move(value);
@@ -34,18 +57,27 @@ namespace std {
             };
         }
 
+        //! Returns true if the `std::any` still holds a value, false once it has been taken out with `cast<T>()`.
         fun has_value(*const this) -> bool {
             return this->val != null;
         }
 
+        //! Returns the `core::type_info` of the held type.
         fun type(*const this) -> core::type_info {
             return this->type_info;
         }
 
+        //! Returns the `type_id` of the held type. Compare it with `type_id<T>()` to know which type this container is holding.
         fun type_id(*const this) -> uint64 {
             return this->type_info.id;
         }
 
+        //! Returns a const pointer to the held value, or a `std::cast_error` if it isn't a `T` or has already been taken out.
+        //!
+        //! The `std::any` keeps ownership of the value, the pointer is only valid as long as the `std::any` lives.
+        //!
+        //! TODO: Once the as operator will be overloadable, if the held type isn't T,
+        //! but can be casted to T, you will be able to get a T type from a U held type.
         fun get<T>(*const this) -> std::expected<*const T, std::cast_error> {
             if this->type_info.id != type_id<T>() {
                 return std::expected<
@@ -66,6 +98,12 @@ namespace std {
                     this->val as *const T);
         }
 
+        //! Returns a mutable pointer to the held value, or a `std::cast_error` if it isn't a `T` or has already been taken out.
+        //!
+        //! The `std::any` keeps ownership of the value, the pointer is only valid as long as the `std::any` lives.
+        //!
+        //! TODO: Once the as operator will be overloadable, if the held type isn't T,
+        //! but can be casted to T, you will be able to get a T type from a U held type.
         fun get_mut<T>(*this) -> std::expected<*T, std::cast_error> {
             if this->type_info.id != type_id<T>() {
                 return std::expected<
@@ -86,6 +124,12 @@ namespace std {
                     this->val as *T);
         }
 
+        //! Takes the value out of the container, leaving it empty. Returns a `std::cast_error` if the held value isn't a `T` or was already taken.
+        //!
+        //! After this call, `has_value()` returns false and any further `cast<T>()` returns `MOVED_ANY_VALUE`.
+        //!
+        //! TODO: Once the as operator will be overloadable, if the held type isn't T,
+        //! but can be casted to T, you will be able to get a T type from a U held type.
         fun cast<T>(this) -> std::expected<T, std::cast_error> {
             if this.type_info.id != type_id<T>() {
                 return std::expected<

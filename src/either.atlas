@@ -1,6 +1,11 @@
+//! A value that is one of two types. `std::either<L, R>` holds either a `left: L` or a `right: R`.
+//!
+//! Unlike `std::expected<T, E>`, neither side carries the meaning of "error". Both sides are just values.
+
 import "memory.atlas";
 
 namespace std {
+    //! Storage for `either<L, R>`. Holds a `left: L`, a `right: R` or the `empty` sentinel once the value was taken out.
     private union __either_storage<L, R> {
       public:
         left: L;
@@ -9,11 +14,29 @@ namespace std {
         empty: std::empty;
     }
 
+    //! A container holding either a value of type `L` or a value of type `R`.
+    //!
+    //! - Construct with `either::left(value)` or `either::right(value)`.
+    //! - Query with `is_left()` / `is_right()`.
+    //! - Take the value out with `get_left()` / `get_right()`, which leaves the either unset.
+    //!
+    //! ```
+    //! let e = std::either<int64, std::string>::left(42);
+    //! if e.is_left() {
+    //!     let n = e.get_left();
+    //! }
+    //! ```
+    //!
+    //! NB: The fields are public for now, but you shouldn't touch them directly. They will become private.
     public struct either<L, R> {
       public:
+        //! The raw storage. Which side is valid is tracked by `is_left` and `is_set`.
         data: std::__either_storage<L, R>;
+        //! True if `data.left` is the valid side.
         is_left: bool;
+        //! False once the value has been taken out (or was never set), in which case the destructor does nothing.
         is_set: bool;
+        //! Drops the held value if there is still one.
         ~either() {
             if this->is_set {
                 if this->is_left {
@@ -23,6 +46,7 @@ namespace std {
                 }
             }
         }
+        //! Construct an `either<L, R>` holding `l` on the left side.
         fun left(l: L) -> std::either<L, R> {
             return std::either<L, R> {
                 .data = std::__either_storage<L, R> {
@@ -32,6 +56,7 @@ namespace std {
                 .is_set = true,
             };
         }
+        //! Construct an `either<L, R>` holding `r` on the right side.
         fun right(r: R) -> std::either<L, R> {
             return std::either<L, R> {
                 .data = std::__either_storage<L, R> {
@@ -42,15 +67,22 @@ namespace std {
             };
         }
 
+        //! Returns true if a value is held and it's on the left side.
         fun is_left(*const this) -> bool {
             return this->is_set && this->is_left;
         }
+        //! Returns true if a value is still held, whichever side it's on.
         fun is_set(*const this) -> bool {
             return this->is_set;
         }
+        //! Returns true if a value is held and it's on the right side.
         fun is_right(*const this) -> bool {
             return this->is_set && !this->is_left;
         }
+        //! Consumes the either and returns a new one with the two sides swapped. A left becomes a right and vice versa.
+        //!
+        //! If the either wasn't set, the returned one isn't set either.
+        //!
         //! TODO: This should become a consuming method
         fun invert(this) -> std::either<R, L> {
             // Avoid running the destructor on the previous type
@@ -82,6 +114,11 @@ namespace std {
                 .is_left = true,
             };
         }
+        //! Applies `f_left` if this is a left, `f_right` if this is a right, and wraps the result in a new either.
+        //!
+        //! If the either isn't set, neither function is called and the returned either isn't set.
+        //!
+        //! NB: The held value is passed to the function by value, but the either is still marked as set afterwards.
         fun map<A, B>(*this, f_left: fun(L) -> A, f_right: fun(R) -> B) -> std::either<A, B> {
             if this->is_left() {
                 return std::either<A, B>::left(f_left(this->data.left));
@@ -97,6 +134,7 @@ namespace std {
             };
         }
 
+        //! Takes the left value out, leaving the either unset. Panics if this isn't a left.
         fun get_left(*this) -> L {
             if this->is_left() {
                 this->is_set = false;
@@ -104,6 +142,7 @@ namespace std {
             }
             panic("Called get_left() on an either that is not a left");
         }
+        //! Takes the right value out, leaving the either unset. Panics if this isn't a right.
         fun get_right(*this) -> R {
             if this->is_right() {
                 this->is_set = false;

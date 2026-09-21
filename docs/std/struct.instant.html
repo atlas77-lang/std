@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,10 +145,16 @@
 <h1><span class="kind">Struct</span> std::instant</h1>
 <pre class="code">struct std::instant</pre>
 <p class="source">Declared in <a href="../files/src-time.atlas.html">src/time.atlas</a></p>
+<p>A point in time, expressed in nanoseconds since the Unix epoch (January 1, 1970).</p>
+<pre><code>let start = std::instant::now();
+// ... do something ...
+let elapsed = start.elapsed();
+</code></pre>
 <section>
 <h2>Fields</h2>
 <div class="member" id="field.ns">
 <pre class="code">ns: int64</pre>
+<p>Nanoseconds since the Unix epoch</p>
 </div>
 </section>
 <section>
@@ -156,9 +162,11 @@
 <div class="member" id="method.difference">
 <pre class="code">fun difference(*const this, other: std::instant) -&gt; std::duration </pre>
 <p>Returns the difference between this instant and another instant as a duration.</p>
+<p>The result is <code>this - other</code>, so it’s negative if <code>other</code> is after <code>this</code>.</p>
 </div>
 <div class="member" id="method.elapsed">
 <pre class="code">fun elapsed(*const this) -&gt; std::duration </pre>
+<p>Returns the time elapsed between this instant and now.</p>
 </div>
 <div class="member" id="method.is_after">
 <pre class="code">fun is_after(*const this, other: std::instant) -&gt; bool </pre>
@@ -170,6 +178,7 @@
 </div>
 <div class="member" id="method.now">
 <pre class="code">fun now() -&gt; std::instant </pre>
+<p>Returns the current time.</p>
 </div>
 </section>
 </main>

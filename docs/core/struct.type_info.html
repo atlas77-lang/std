@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,43 +145,57 @@
 <h1><span class="kind">Struct</span> core::type_info</h1>
 <pre class="code">struct core::type_info</pre>
 <p class="source">Declared in <a href="../files/src-reflection.atlas.html">src/reflection.atlas</a></p>
+<p>Everything the compiler knows about a type. Obtained through <code>type_of&lt;T&gt;()</code>.</p>
+<p>The layout of this struct is tied to the compiler, so it will change alongside it.</p>
 <section>
 <h2>Fields</h2>
 <div class="member" id="field.align">
 <pre class="code">align: uint64</pre>
+<p>Alignment of the type in bytes. Same value as <code>align_of&lt;T&gt;()</code></p>
 </div>
 <div class="member" id="field.field_count">
 <pre class="code">field_count: uint64</pre>
+<p>Number of entries in <code>field_names</code></p>
 </div>
 <div class="member" id="field.field_names">
 <pre class="code">field_names: [str]</pre>
+<p>Names of every field declared on the type</p>
 </div>
 <div class="member" id="field.id">
 <pre class="code">id: uint64</pre>
+<p>Unique id of the type. Same value as <code>type_id&lt;T&gt;()</code></p>
 </div>
 <div class="member" id="field.is_copyable">
 <pre class="code">is_copyable: bool</pre>
+<p>Whether the type implements <code>std::copyable</code></p>
 </div>
 <div class="member" id="field.is_default">
 <pre class="code">is_default: bool</pre>
+<p>Whether the type implements <code>std::default</code></p>
 </div>
 <div class="member" id="field.is_trivially_copyable">
 <pre class="code">is_trivially_copyable: bool</pre>
+<p>Whether the type is tagged <code>#[std::trivially_copyable]</code></p>
 </div>
 <div class="member" id="field.mangled_name">
 <pre class="code">mangled_name: str</pre>
+<p>Name of the type once mangled by the compiler. Mostly useful for debugging the C output</p>
 </div>
 <div class="member" id="field.method_count">
 <pre class="code">method_count: uint64</pre>
+<p>Number of entries in <code>method_names</code></p>
 </div>
 <div class="member" id="field.method_names">
 <pre class="code">method_names: [str]</pre>
+<p>Names of every method declared on the type</p>
 </div>
 <div class="member" id="field.name">
 <pre class="code">name: str</pre>
+<p>Name of the type as written in the source code (e.g. <code>std::vector&lt;int64&gt;</code>)</p>
 </div>
 <div class="member" id="field.size">
 <pre class="code">size: uint64</pre>
+<p>Size of the type in bytes. Same value as <code>size_of&lt;T&gt;()</code></p>
 </div>
 </section>
 </main>

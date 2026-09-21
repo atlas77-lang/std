@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,53 +145,81 @@
 <h1><span class="kind">Struct</span> std::either</h1>
 <pre class="code">struct std::either&lt;L, R&gt;</pre>
 <p class="source">Declared in <a href="../files/src-either.atlas.html">src/either.atlas</a></p>
+<p>A container holding either a value of type <code>L</code> or a value of type <code>R</code>.</p>
+<ul>
+<li>Construct with <code>either::left(value)</code> or <code>either::right(value)</code>.</li>
+<li>Query with <code>is_left()</code> / <code>is_right()</code>.</li>
+<li>Take the value out with <code>get_left()</code> / <code>get_right()</code>, which leaves the either unset.</li>
+</ul>
+<pre><code>let e = std::either&lt;int64, std::string&gt;::left(42);
+if e.is_left() {
+    let n = e.get_left();
+}
+</code></pre>
+<p>NB: The fields are public for now, but you shouldn’t touch them directly. They will become private.</p>
 <section>
 <h2>Fields</h2>
 <div class="member" id="field.data">
 <pre class="code">data: std::__either_storage&lt;L, R&gt;</pre>
+<p>The raw storage. Which side is valid is tracked by <code>is_left</code> and <code>is_set</code>.</p>
 </div>
 <div class="member" id="field.is_left">
 <pre class="code">is_left: bool</pre>
+<p>True if <code>data.left</code> is the valid side.</p>
 </div>
 <div class="member" id="field.is_set">
 <pre class="code">is_set: bool</pre>
+<p>False once the value has been taken out (or was never set), in which case the destructor does nothing.</p>
 </div>
 </section>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.get_left">
 <pre class="code">fun get_left(*this) -&gt; L </pre>
+<p>Takes the left value out, leaving the either unset. Panics if this isn’t a left.</p>
 </div>
 <div class="member" id="method.get_right">
 <pre class="code">fun get_right(*this) -&gt; R </pre>
+<p>Takes the right value out, leaving the either unset. Panics if this isn’t a right.</p>
 </div>
 <div class="member" id="method.invert">
 <pre class="code">fun invert(this) -&gt; std::either&lt;R, L&gt; </pre>
+<p>Consumes the either and returns a new one with the two sides swapped. A left becomes a right and vice versa.</p>
+<p>If the either wasn’t set, the returned one isn’t set either.</p>
 <p>TODO: This should become a consuming method</p>
 </div>
 <div class="member" id="method.is_left">
 <pre class="code">fun is_left(*const this) -&gt; bool </pre>
+<p>Returns true if a value is held and it’s on the left side.</p>
 </div>
 <div class="member" id="method.is_right">
 <pre class="code">fun is_right(*const this) -&gt; bool </pre>
+<p>Returns true if a value is held and it’s on the right side.</p>
 </div>
 <div class="member" id="method.is_set">
 <pre class="code">fun is_set(*const this) -&gt; bool </pre>
+<p>Returns true if a value is still held, whichever side it’s on.</p>
 </div>
 <div class="member" id="method.left">
 <pre class="code">fun left(l: L) -&gt; std::either&lt;L, R&gt; </pre>
+<p>Construct an <code>either&lt;L, R&gt;</code> holding <code>l</code> on the left side.</p>
 </div>
 <div class="member" id="method.map">
 <pre class="code">fun map(*this, f_left: fun(L) -&gt; A, f_right: fun(R) -&gt; B) -&gt; std::either&lt;A, B&gt; </pre>
+<p>Applies <code>f_left</code> if this is a left, <code>f_right</code> if this is a right, and wraps the result in a new either.</p>
+<p>If the either isn’t set, neither function is called and the returned either isn’t set.</p>
+<p>NB: The held value is passed to the function by value, but the either is still marked as set afterwards.</p>
 </div>
 <div class="member" id="method.right">
 <pre class="code">fun right(r: R) -&gt; std::either&lt;L, R&gt; </pre>
+<p>Construct an <code>either&lt;L, R&gt;</code> holding <code>r</code> on the right side.</p>
 </div>
 </section>
 <section>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~either()</pre>
+<p>Drops the held value if there is still one.</p>
 </div>
 </section>
 </main>

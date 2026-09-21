@@ -1,6 +1,9 @@
 [package]
 name = "atlas77-std"
-version = "0.1.0"
+# The version will follow the compiler version
+# At one point, if you have a 0.x compiler, but a 0.y std, it shouldn't directly work
+# The compiler should pull only its linked stdlib
+version = "0.9.0"
 entry = "src/main.atlas"
 compiler = "gcc"
 args = ["-std=c2y"]

@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,10 +145,18 @@
 <h1><span class="kind">Concept</span> std::to_string</h1>
 <pre class="code">concept std::to_string</pre>
 <p class="source">Declared in <a href="../files/src-concepts-to_string.atlas.html">src/concepts/to_string.atlas</a></p>
+<p>Types that can be turned into a <code>std::string</code>.</p>
+<p>Every primitive implements it by going through <code>std::string::to_string&lt;T&gt;()</code>, so <code>42.to_string()</code> just works.
+Implement it on your own types to make them printable.</p>
+<pre><code>let n: int64 = 42;
+let s = n.to_string();
+std::println(s.c_str() as str);
+</code></pre>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.to_string">
 <pre class="code">fun to_string(*const this) -&gt; std::string </pre>
+<p>Returns a new <code>std::string</code> representing <code>this</code>.</p>
 </div>
 </section>
 <section>

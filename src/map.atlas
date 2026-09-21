@@ -12,6 +12,7 @@ import "concepts/hashable.atlas";
 // TODO: Add back `std::hashable` as contraints
 // I removed it temporarily
 namespace std {
+    //! A key/value pair owned by a `std::map<K, V>`. Deleting it deletes both the key and the value.
     private struct map_pair<K: operator::equal + std::hashable, V> {
       public:
         key: K;
@@ -24,6 +25,7 @@ namespace std {
     }
 
     #[std::trivially_copyable]
+    //! A single slot of the bucket array. `dib` is the "distance to initial bucket", the core of Robin Hood hashing.
     private struct map_bucket<K: operator::equal + std::hashable, V> {
       public:
         occupied: bool;
@@ -32,6 +34,22 @@ namespace std {
         pair: *std::map_pair<K, V>;
     }
 
+    //! A hash map from `K` to `V`, using Robin Hood open-addressing.
+    //!
+    //! Keys need to be `std::hashable` and support `operator::equal`. All the primitive types do.
+    //! The map owns its keys and values: they are deleted when removed, overwritten or when the map is destroyed.
+    //! The bucket array grows (doubling) once it's 80% full.
+    //!
+    //! ```
+    //! let m = std::map<int64, std::string>::new();
+    //! m.insert(1, std::string::from_chars("one"));
+    //! let key: int64 = 1;
+    //! if m.contains_key(&key) {
+    //!     let value: *const std::string = m.get(key);
+    //! }
+    //! ```
+    //!
+    //! Lookups go through the `std::indexable` conformance (`get`/`get_mut`), see below.
     public struct map<K: operator::equal + std::hashable, V> {
       private:
         buckets: *std::map_bucket<K, V>;
@@ -39,10 +57,12 @@ namespace std {
         capacity: uint64;
 
       public:
+        //! Creates an empty map with a default capacity of 16 buckets.
         fun new() -> std::map<K, V> {
             return std::map<K, V>::with_capacity(16u);
         }
 
+        //! Creates an empty map with room for `cap` buckets. Anything under 8 is rounded up to 8.
         fun with_capacity(cap: uint64) -> std::map<K, V> {
             let out = std::map<K, V> {
                 .buckets = null,
@@ -53,6 +73,7 @@ namespace std {
             return out;
         }
 
+        //! Deletes every pair still in the map, then frees the bucket array.
         ~map() {
             this->destroy_all_pairs();
             if this->buckets != null {
@@ -63,18 +84,22 @@ namespace std {
             this->capacity = 0u;
         }
 
+        //! Returns the number of pairs in the map.
         fun len(*const this) -> uint64 {
             return this->length;
         }
 
+        //! Returns true if the map holds no pair.
         fun is_empty(*const this) -> bool {
             return this->length == 0u;
         }
 
+        //! Returns the number of buckets. Not the number of pairs, see `len()` for that.
         fun cap(*const this) -> uint64 {
             return this->capacity;
         }
 
+        //! Returns true if a pair with the given key is in the map.
         fun contains_key(*const this, key: *const K) -> bool {
             if this->capacity == 0u {
                 return false;
@@ -83,6 +108,9 @@ namespace std {
         }
 
         //! Insert key/value. If key exists, replaces value.
+        //!
+        //! When the key already exists, the old value is deleted and the given `key` is deleted too
+        //! (the one already stored is kept). Grows the bucket array if needed.
         fun insert(*this, key: K, value: V) {
             this->ensure_capacity_for_insert();
 
@@ -99,11 +127,14 @@ namespace std {
             this->insert_existing_pair(pair_ptr, hash);
         }
 
+        //! Alias of `insert`.
         fun set(*this, key: K, value: V) {
             this->insert(std::move(key), std::move(value));
         }
 
         //! Remove key if present.
+        //!
+        //! Returns true if a pair was actually removed. The key and the value are deleted.
         fun remove(*this, key: *const K) -> bool {
             if this->capacity == 0u {
                 return false;
@@ -138,6 +169,7 @@ namespace std {
             return true;
         }
 
+        //! Deletes every pair, keeping the bucket array allocated at its current capacity.
         fun clear(*this) {
             this->destroy_all_pairs();
 
@@ -155,6 +187,9 @@ namespace std {
             this->length = 0u;
         }
 
+        //! Returns a vector of pointers to every pair in the map, in bucket order (so, no particular order).
+        //!
+        //! The pointers are only valid until the next mutation of the map.
         fun pairs(*const this) -> std::vector<*const std::map_pair<K, V>> {
             let vec = std::vector<*const std::map_pair<K, V>>::with_capacity(this->length);
             let i: uint64 = 0u;
@@ -345,11 +380,12 @@ namespace std {
         }
     }
 
+    //! Index a map with a key, giving back a pointer to the matching value or `null` if the key isn't in the map.
     extend std::map<K, V> with std::indexable {
         type index_t = K;
         type index_val_t = V;
 
-        // Return nullable pointer to value.
+        //! Returns a const pointer to the value stored for `idx`, or `null` if the key isn't in the map.
         fun get(*const this, idx: This::index_t) -> *const This::index_val_t {
             if this->capacity == 0u {
                 return null;
@@ -362,7 +398,7 @@ namespace std {
 
             return &this->buckets[index].pair->value;
         }
-        // Return nullable mutable pointer to value.
+        //! Returns a mutable pointer to the value stored for `idx`, or `null` if the key isn't in the map.
         fun get_mut(*this, idx: This::index_t) -> *This::index_val_t {
             if this->capacity == 0u {
                 return null;

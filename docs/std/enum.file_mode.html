@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,19 +145,24 @@
 <h1><span class="kind">Enum</span> std::FILE_MODE</h1>
 <pre class="code">enum std::FILE_MODE</pre>
 <p class="source">Declared in <a href="../files/src-file.atlas.html">src/file.atlas</a></p>
+<p>How a file should be opened. Maps to the C <code>fopen</code> mode strings.</p>
 <section>
 <h2>Variants</h2>
 <div class="member" id="variant.read">
 <pre class="code">READ = 0</pre>
+<p>Read only, the file must exist (<code>"r"</code>)</p>
 </div>
 <div class="member" id="variant.write">
 <pre class="code">WRITE = 1</pre>
+<p>Write only, the file is created or truncated (<code>"w"</code>)</p>
 </div>
 <div class="member" id="variant.append">
 <pre class="code">APPEND = 2</pre>
+<p>Write only, at the end of the file, which is created if needed (<code>"a"</code>)</p>
 </div>
 <div class="member" id="variant.read_write">
 <pre class="code">READ_WRITE = 3</pre>
+<p>Read and write, the file must exist (<code>"r+"</code>)</p>
 </div>
 </section>
 </main>

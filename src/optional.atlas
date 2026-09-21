@@ -26,6 +26,14 @@ namespace std {
     //! - When `has_value` is true, `data.value` is valid and will be dropped
     //!   by the destructor.
     //! - Create instances via `optional::of(value)` or `optional::empty()`.
+    //! - Most accessors consume the optional: once you took the value out, it's empty.
+    //!
+    //! ```
+    //! let opt = std::optional<int64>::of(42);
+    //! if opt.has_value() {
+    //!     let n = opt.value(); // opt is now empty
+    //! }
+    //! ```
     public struct optional<T> {
     private:
         data: std::optional_storage<T>;
@@ -43,8 +51,9 @@ namespace std {
 
         //! Construct an `optional<T>` containing `data`.
         //!
-        //! Example:
-        //!     let some = optional<int64>::of(42);
+        //! ```
+        //! let some = std::optional<int64>::of(42);
+        //! ```
         fun of(data: T) -> std::optional<T> {
             return std::optional<T> {
                 .data = std::optional_storage<T> { 
@@ -55,8 +64,9 @@ namespace std {
         }
         //! Construct an empty `optional<T>` with no value.
         //!
-        //! Example:
-        //!     let none = optional<int64>::empty();
+        //! ```
+        //! let none = std::optional<int64>::empty();
+        //! ```
         fun empty() -> std::optional<T> {
             return std::optional<T> {
                 .data = std::optional_storage<T> { 
@@ -65,13 +75,15 @@ namespace std {
                 .has_value = false
             };
         }
+        //! Returns true if no value is present. The opposite of `has_value()`.
         fun is_empty(*const this) -> bool {
             return !this->has_value;
         }
         //! Returns true if a value is present.
         //!
-        //! Example:
-        //!     if (opt.has_value()) { println("has value"); }
+        //! ```
+        //! if opt.has_value() { std::println("has value"); }
+        //! ```
         fun has_value(*const this) -> bool {
             return this->has_value;
         }
@@ -93,9 +105,10 @@ namespace std {
         }
         //! Consume the optional and return the contained value or `default` if empty.
         //!
-        //! Example:
-        //!     let opt = optional<int64>::empty();
-        //!     let n = opt.value_or(0);
+        //! ```
+        //! let opt = std::optional<int64>::empty();
+        //! let n = opt.value_or(0);
+        //! ```
         fun value_or(*this, default: T) -> T {
             if (this->has_value) {
                 // Move the value out before marking as empty
@@ -110,15 +123,28 @@ namespace std {
                 return default;
             }
         }
+        //! Returns a pointer to the contained value without consuming the optional.
+        //!
+        //! Nothing is checked: calling this on an empty optional gives you a pointer to garbage.
+        //! Check `has_value()` first.
         fun get(*const this) -> *const T {
             return &this->data.value;
         }
+        //! Same as `get()`. Returns a pointer to the contained value without consuming the optional.
+        //!
+        //! Nothing is checked: calling this on an empty optional gives you a pointer to garbage.
         fun get_value(*const this) -> *const T {
             return &this->data.value;
         }
+        //! `!opt` returns true if a value is present. Allows to write `if !opt { ... }`
+        //!
+        //! NB: The naming is confusing, it doesn't negate anything. It will probably change.
         operator not(*const this) -> bool {
             return this->has_value();
         }
+        //! `*opt` consumes the optional and returns the contained value. Panics if it's empty.
+        //!
+        //! Same behaviour as `value()`.
         // We could do compile time magic in the future to make it so for `std::trivially_copyable` types we don't set `has_value` to false
         operator deref(*this) -> T {
             if !this->has_value() {

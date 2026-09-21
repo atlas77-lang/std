@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -143,120 +143,132 @@
 </nav>
 <main id="content">
 <h1>std</h1>
-<p>Standard library for the atlas77 programming language.
-As of today it’s still way too unstable…</p>
+<h1>The Atlas77 Standard Library</h1>
+<p>It is the base on which all (or at least most) atlas software is built upon.
+It defines a minimal set of vital core components like <code>std::vector&lt;T&gt;</code>, <code>std::optional&lt;T&gt;</code> &amp; <code>std::expected&lt;T, E&gt;</code></p>
+<p><strong>DISCLAIMER</strong>: This library isn’t stable, and will have a lot of breaking changes leading up to the 1.0 release.</p>
+<h2>What’s in there</h2>
+<ul>
+<li>Containers: <code>std::vector&lt;T&gt;</code>, <code>std::map&lt;K, V&gt;</code>, <code>std::string</code></li>
+<li>Sum types: <code>std::optional&lt;T&gt;</code>, <code>std::expected&lt;T, E&gt;</code>, <code>std::either&lt;L, R&gt;</code>, <code>std::any</code></li>
+<li>Memory: <code>std::shared_ptr&lt;T&gt;</code>, <code>std::atomic&lt;T&gt;</code>, <code>std::alloc</code>/<code>std::zero_alloc</code>, <code>std::ptr</code></li>
+<li>Concepts: <code>std::comparable</code>, <code>std::copyable</code>, <code>std::default</code>, <code>std::hashable</code>, <code>std::to_string</code>, <code>std::indexable</code>…</li>
+<li>OS: <code>std::file</code>, <code>std::directory</code>, <code>std::instant</code>/<code>std::duration</code>, <code>std::print</code>/<code>std::input</code></li>
+<li>Math: rounding, powers, logarithms, trigonometry</li>
+</ul>
+<p>The <code>libc</code> namespace holds the raw bindings everything above is built on, and <code>core</code> holds what the compiler provides.</p>
 <section>
 <h2>Namespaces</h2>
 <ul class="listing"><li><a href="../std/ptr/index.html">std::ptr</a></li>
 </ul></section>
 <section>
 <h2>Structs</h2>
-<ul class="listing"><li><a href="../std/struct.stdin.html"><code>Stdin</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.any.html"><code>any</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.atomic.html"><code>atomic</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.directory.html"><code>directory</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.duration.html"><code>duration</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.either.html"><code>either</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="../std/struct.stdin.html"><code>Stdin</code></a> <span class="blurb">Handle over the standard input stream.</span></li>
+<li><a href="../std/struct.any.html"><code>any</code></a> <span class="blurb">A type erased container. It holds a single value of any type `T`, and only gives it back if you ask for that exact `T`.</span></li>
+<li><a href="../std/struct.atomic.html"><code>atomic</code></a> <span class="blurb">Wrapper around an `__atomic T` type. Only allows primitive types for now.</span></li>
+<li><a href="../std/struct.directory.html"><code>directory</code></a> <span class="blurb">An open directory, iterated entry by entry with `next()`.</span></li>
+<li><a href="../std/struct.duration.html"><code>duration</code></a> <span class="blurb">A length of time, in nanoseconds. Can be negative.</span></li>
+<li><a href="../std/struct.either.html"><code>either</code></a> <span class="blurb">A container holding either a value of type `L` or a value of type `R`.</span></li>
 <li><a href="../std/struct.empty.html"><code>empty</code></a> <span class="blurb">A zero-sized type used as a sentinel for empty states in unions.</span></li>
 <li><a href="../std/struct.expected.html"><code>expected</code></a> <span class="blurb">A result-like type representing either a value `T` or an error `E`.</span></li>
-<li><a href="../std/struct.file.html"><code>file</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.instant.html"><code>instant</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.map.html"><code>map</code></a> <span class="blurb"></span></li>
+<li><a href="../std/struct.file.html"><code>file</code></a> <span class="blurb">An open file. Wrapper around a C `FILE*` that closes itself when destroyed.</span></li>
+<li><a href="../std/struct.instant.html"><code>instant</code></a> <span class="blurb">A point in time, expressed in nanoseconds since the Unix epoch (January 1, 1970).</span></li>
+<li><a href="../std/struct.map.html"><code>map</code></a> <span class="blurb">A hash map from `K` to `V`, using Robin Hood open-addressing.</span></li>
 <li><a href="../std/struct.optional.html"><code>optional</code></a> <span class="blurb">A lightweight container for an optional value of type `T`.</span></li>
-<li><a href="../std/struct.shared_ptr.html"><code>shared_ptr</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.string.html"><code>string</code></a> <span class="blurb">Bootiful std::string type</span></li>
-<li><a href="../std/struct.vector.html"><code>vector</code></a> <span class="blurb"></span></li>
-<li><a href="../std/struct.weak_ptr.html"><code>weak_ptr</code></a> <span class="blurb">NB: Not properly implemented just yet...</span></li>
+<li><a href="../std/struct.shared_ptr.html"><code>shared_ptr</code></a> <span class="blurb">A pointer to a heap allocated `T` shared between several owners. The value is destroyed once the last owner is gone.</span></li>
+<li><a href="../std/struct.string.html"><code>string</code></a> <span class="blurb">Owned, growable, null terminated byte string.</span></li>
+<li><a href="../std/struct.vector.html"><code>vector</code></a> <span class="blurb">A contiguous, growable array of `T`.</span></li>
+<li><a href="../std/struct.weak_ptr.html"><code>weak_ptr</code></a> <span class="blurb">Not really implemented. This type doesn&#39;t work and should **NOT** be used at any cost rn.</span></li>
 </ul></section>
 <section>
 <h2>Concepts</h2>
-<ul class="listing"><li><a href="../std/concept.comparable.html"><code>comparable</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.copyable.html"><code>copyable</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.default.html"><code>default</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.extendable.html"><code>extendable</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.hashable.html"><code>hashable</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.indexable.html"><code>indexable</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.iterable.html"><code>iterable</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.iterator.html"><code>iterator</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.number.html"><code>number</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.primitive.html"><code>primitive</code></a> <span class="blurb"></span></li>
-<li><a href="../std/concept.to_string.html"><code>to_string</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="../std/concept.comparable.html"><code>comparable</code></a> <span class="blurb">Types with a total order. Implement `compare` and every comparison operator comes for free.</span></li>
+<li><a href="../std/concept.copyable.html"><code>copyable</code></a> <span class="blurb">Types that can be explicitly duplicated with `.copy()`.</span></li>
+<li><a href="../std/concept.default.html"><code>default</code></a> <span class="blurb">Types that have a sensible &quot;zero&quot; value, obtained through `T::default()`.</span></li>
+<li><a href="../std/concept.extendable.html"><code>extendable</code></a> <span class="blurb">Containers that can be extended with the content of anything `std::iterable`.</span></li>
+<li><a href="../std/concept.hashable.html"><code>hashable</code></a> <span class="blurb">Types that can be reduced to a `uint64` hash. Required for the keys of a `std::map&lt;K, V&gt;`.</span></li>
+<li><a href="../std/concept.indexable.html"><code>indexable</code></a> <span class="blurb">Containers that can be looked up by an index (or a key), giving back a pointer to the stored value.</span></li>
+<li><a href="../std/concept.iterable.html"><code>iterable</code></a> <span class="blurb">Something that can produce a `std::iterator` over its content.</span></li>
+<li><a href="../std/concept.iterator.html"><code>iterator</code></a> <span class="blurb">Something that yields values one at a time, until it runs out.</span></li>
+<li><a href="../std/concept.number.html"><code>number</code></a> <span class="blurb">Numeric types with a known range. Gives access to the smallest and largest value of the type.</span></li>
+<li><a href="../std/concept.primitive.html"><code>primitive</code></a> <span class="blurb">Marker concept for the built-in types: every integer, both floats, `char`, `bool` and `str`.</span></li>
+<li><a href="../std/concept.to_string.html"><code>to_string</code></a> <span class="blurb">Types that can be turned into a `std::string`.</span></li>
 </ul></section>
 <section>
 <h2>Enums</h2>
-<ul class="listing"><li><a href="../std/enum.file_mode.html"><code>FILE_MODE</code></a> <span class="blurb"></span></li>
-<li><a href="../std/enum.ordering.html"><code>ordering</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="../std/enum.file_mode.html"><code>FILE_MODE</code></a> <span class="blurb">How a file should be opened. Maps to the C `fopen` mode strings.</span></li>
+<li><a href="../std/enum.cast_error.html"><code>cast_error</code></a> <span class="blurb">Error cases for the `std::any` struct. Tells you why `std::any::get&lt;T&gt;()`, `get_mut&lt;T&gt;()` or `cast&lt;T&gt;()` failed.</span></li>
+<li><a href="../std/enum.ordering.html"><code>ordering</code></a> <span class="blurb">Result of a comparison between two values: `LESS`, `EQUAL` or `GREATER`.</span></li>
 </ul></section>
 <section>
 <h2>Functions</h2>
-<ul class="listing"><li><a href="../std/fn.abs.html"><code>abs</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.abs_i64.html"><code>abs_i64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.absf.html"><code>absf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.absf64.html"><code>absf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.acos.html"><code>acos</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.acosh.html"><code>acosh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.alloc.html"><code>alloc</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.asin.html"><code>asin</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.asinh.html"><code>asinh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atan.html"><code>atan</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atan2.html"><code>atan2</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atanh.html"><code>atanh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atlas_directory_close.html"><code>atlas_directory_close</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atlas_directory_next.html"><code>atlas_directory_next</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.atlas_directory_open.html"><code>atlas_directory_open</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cbrt.html"><code>cbrt</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cbrtf.html"><code>cbrtf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.ceil.html"><code>ceil</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.ceilf.html"><code>ceilf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.copy.html"><code>copy</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.copysign.html"><code>copysign</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.copysignf64.html"><code>copysignf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cos.html"><code>cos</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.cosh.html"><code>cosh</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="../std/fn.abs.html"><code>abs</code></a> <span class="blurb">Absolute value of an `int32`.</span></li>
+<li><a href="../std/fn.abs_i64.html"><code>abs_i64</code></a> <span class="blurb">Absolute value of an `int64`.</span></li>
+<li><a href="../std/fn.absf.html"><code>absf</code></a> <span class="blurb">Absolute value of a `float32`.</span></li>
+<li><a href="../std/fn.absf64.html"><code>absf64</code></a> <span class="blurb">Absolute value of a `float64`.</span></li>
+<li><a href="../std/fn.acos.html"><code>acos</code></a> <span class="blurb">Arc cosine of `x`, in radians in `[0, pi]`. `x` must be in `[-1, 1]`.</span></li>
+<li><a href="../std/fn.acosh.html"><code>acosh</code></a> <span class="blurb">Inverse hyperbolic cosine of `x`. `x` must be greater or equal to `1`.</span></li>
+<li><a href="../std/fn.alloc.html"><code>alloc</code></a> <span class="blurb">Allocates enough uninitialized memory for a single `T` and returns a pointer to it.</span></li>
+<li><a href="../std/fn.asin.html"><code>asin</code></a> <span class="blurb">Arc sine of `x`, in radians in `[-pi/2, pi/2]`. `x` must be in `[-1, 1]`.</span></li>
+<li><a href="../std/fn.asinh.html"><code>asinh</code></a> <span class="blurb">Inverse hyperbolic sine of `x`.</span></li>
+<li><a href="../std/fn.atan.html"><code>atan</code></a> <span class="blurb">Arc tangent of `x`, in radians in `[-pi/2, pi/2]`.</span></li>
+<li><a href="../std/fn.atan2.html"><code>atan2</code></a> <span class="blurb">Arc tangent of `y / x`, in radians in `[-pi, pi]`, using the signs of both arguments to pick the right quadrant.</span></li>
+<li><a href="../std/fn.atanh.html"><code>atanh</code></a> <span class="blurb">Inverse hyperbolic tangent of `x`. `x` must be in `(-1, 1)`.</span></li>
+<li><a href="../std/fn.atlas_directory_close.html"><code>atlas_directory_close</code></a> <span class="blurb">Closes a directory handle obtained from `atlas_directory_open`.</span></li>
+<li><a href="../std/fn.atlas_directory_next.html"><code>atlas_directory_next</code></a> <span class="blurb">Returns the name of the next entry of the directory, or `null` once exhausted. Prefer `std::directory::next`.</span></li>
+<li><a href="../std/fn.atlas_directory_open.html"><code>atlas_directory_open</code></a> <span class="blurb">Opens the directory at `path` for iteration. Returns `null` on failure. Prefer `std::directory::open`.</span></li>
+<li><a href="../std/fn.cbrt.html"><code>cbrt</code></a> <span class="blurb">Cube root of `x`. Works for negative values too.</span></li>
+<li><a href="../std/fn.cbrtf.html"><code>cbrtf</code></a> <span class="blurb">`float32` version of `cbrt`.</span></li>
+<li><a href="../std/fn.ceil.html"><code>ceil</code></a> <span class="blurb">Rounds `x` up to the smallest integer not less than `x`. `ceil(2.2) == 3.0`, `ceil(-2.2) == -2.0`.</span></li>
+<li><a href="../std/fn.ceilf.html"><code>ceilf</code></a> <span class="blurb">`float32` version of `ceil`.</span></li>
+<li><a href="../std/fn.copysign.html"><code>copysign</code></a> <span class="blurb">`float32` version of `copysignf64`.</span></li>
+<li><a href="../std/fn.copysignf64.html"><code>copysignf64</code></a> <span class="blurb">Returns `x` with the sign of `y`.</span></li>
+<li><a href="../std/fn.cos.html"><code>cos</code></a> <span class="blurb">Cosine of `x` (in radians).</span></li>
+<li><a href="../std/fn.cosh.html"><code>cosh</code></a> <span class="blurb">Hyperbolic cosine of `x`.</span></li>
 <li><a href="../std/fn.deleter.html"><code>deleter</code></a> <span class="blurb">A deleter function for T. Useful for when you need to store the destructor of T in a struct.</span></li>
-<li><a href="../std/fn.exp.html"><code>exp</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.exp2.html"><code>exp2</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.exp2f.html"><code>exp2f</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.expf.html"><code>expf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.floor.html"><code>floor</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.floorf.html"><code>floorf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.hypotf.html"><code>hypotf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.hypotf64.html"><code>hypotf64</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.exp.html"><code>exp</code></a> <span class="blurb">`e` raised to the power `x`.</span></li>
+<li><a href="../std/fn.exp2.html"><code>exp2</code></a> <span class="blurb">`2` raised to the power `x`.</span></li>
+<li><a href="../std/fn.exp2f.html"><code>exp2f</code></a> <span class="blurb">`float32` version of `exp2`.</span></li>
+<li><a href="../std/fn.expf.html"><code>expf</code></a> <span class="blurb">`float32` version of `exp`.</span></li>
+<li><a href="../std/fn.floor.html"><code>floor</code></a> <span class="blurb">Rounds `x` down to the largest integer not greater than `x`. `floor(2.7) == 2.0`, `floor(-2.7) == -3.0`.</span></li>
+<li><a href="../std/fn.floorf.html"><code>floorf</code></a> <span class="blurb">`float32` version of `floor`.</span></li>
+<li><a href="../std/fn.hypotf.html"><code>hypotf</code></a> <span class="blurb">`float32` version of `hypotf64`.</span></li>
+<li><a href="../std/fn.hypotf64.html"><code>hypotf64</code></a> <span class="blurb">Length of the hypotenuse of a right triangle with sides `x` and `y`, i.e. `sqrt(x * x + y * y)` without the overflow.</span></li>
 <li><a href="../std/fn.input.html"><code>input</code></a> <span class="blurb">Read a line from standard input</span></li>
-<li><a href="../std/fn.log.html"><code>log</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log10.html"><code>log10</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log10f.html"><code>log10f</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log2.html"><code>log2</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.log2f.html"><code>log2f</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.logf.html"><code>logf</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.log.html"><code>log</code></a> <span class="blurb">Natural logarithm (base `e`) of `x`.</span></li>
+<li><a href="../std/fn.log10.html"><code>log10</code></a> <span class="blurb">Base 10 logarithm of `x`.</span></li>
+<li><a href="../std/fn.log10f.html"><code>log10f</code></a> <span class="blurb">`float32` version of `log10`.</span></li>
+<li><a href="../std/fn.log2.html"><code>log2</code></a> <span class="blurb">Base 2 logarithm of `x`.</span></li>
+<li><a href="../std/fn.log2f.html"><code>log2f</code></a> <span class="blurb">`float32` version of `log2`.</span></li>
+<li><a href="../std/fn.logf.html"><code>logf</code></a> <span class="blurb">`float32` version of `log`.</span></li>
 <li><a href="../std/fn.max.html"><code>max</code></a> <span class="blurb">Integer maximum. C has no standard fmax-like integer function.</span></li>
-<li><a href="../std/fn.maxf.html"><code>maxf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.maxf64.html"><code>maxf64</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.maxf.html"><code>maxf</code></a> <span class="blurb">`float32` version of `maxf64`.</span></li>
+<li><a href="../std/fn.maxf64.html"><code>maxf64</code></a> <span class="blurb">Largest of `x` and `y`. If one of them is NaN, the other one is returned.</span></li>
 <li><a href="../std/fn.min.html"><code>min</code></a> <span class="blurb">Integer minimum. C has no standard fmin-like integer function.</span></li>
-<li><a href="../std/fn.minf.html"><code>minf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.minf64.html"><code>minf64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.modf.html"><code>modf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.modf64.html"><code>modf64</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.minf.html"><code>minf</code></a> <span class="blurb">`float32` version of `minf64`.</span></li>
+<li><a href="../std/fn.minf64.html"><code>minf64</code></a> <span class="blurb">Smallest of `x` and `y`. If one of them is NaN, the other one is returned.</span></li>
+<li><a href="../std/fn.modf.html"><code>modf</code></a> <span class="blurb">`float32` version of `modf64`.</span></li>
+<li><a href="../std/fn.modf64.html"><code>modf64</code></a> <span class="blurb">Floating point remainder of `x / y`. The result has the sign of `x`.</span></li>
 <li><a href="../std/fn.panic.html"><code>panic</code></a> <span class="blurb">Panic the program with a value</span></li>
-<li><a href="../std/fn.pow.html"><code>pow</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.pow.html"><code>pow</code></a> <span class="blurb">`x` raised to the power `y`. See `pow_i64` for integers.</span></li>
 <li><a href="../std/fn.pow_i64.html"><code>pow_i64</code></a> <span class="blurb">Integer power.</span></li>
-<li><a href="../std/fn.powf.html"><code>powf</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.powf.html"><code>powf</code></a> <span class="blurb">`float32` version of `pow`.</span></li>
 <li><a href="../std/fn.print.html"><code>print</code></a> <span class="blurb">Print a value without a newline</span></li>
 <li><a href="../std/fn.printf.html"><code>printf</code></a> <span class="blurb">Well, still needs to be worked on...</span></li>
 <li><a href="../std/fn.println.html"><code>println</code></a> <span class="blurb">Print a value followed by a newline</span></li>
-<li><a href="../std/fn.round.html"><code>round</code></a> <span class="blurb">Math utilities backed by the C standard math library.</span></li>
-<li><a href="../std/fn.round_i64.html"><code>round_i64</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.roundf.html"><code>roundf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sin.html"><code>sin</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sinh.html"><code>sinh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sqrt.html"><code>sqrt</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.sqrtf.html"><code>sqrtf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.take.html"><code>take</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.tan.html"><code>tan</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.tanh.html"><code>tanh</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.trunc.html"><code>trunc</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.truncf.html"><code>truncf</code></a> <span class="blurb"></span></li>
-<li><a href="../std/fn.zero_alloc.html"><code>zero_alloc</code></a> <span class="blurb"></span></li>
+<li><a href="../std/fn.round.html"><code>round</code></a> <span class="blurb">Rounds `x` to the nearest integer, halfway cases away from zero. `round(2.5) == 3.0`, `round(-2.5) == -3.0`.</span></li>
+<li><a href="../std/fn.round_i64.html"><code>round_i64</code></a> <span class="blurb">Rounds `x` to the nearest integer, halfway cases away from zero, and returns it as an `int64`.</span></li>
+<li><a href="../std/fn.roundf.html"><code>roundf</code></a> <span class="blurb">`float32` version of `round`.</span></li>
+<li><a href="../std/fn.sin.html"><code>sin</code></a> <span class="blurb">Sine of `x` (in radians).</span></li>
+<li><a href="../std/fn.sinh.html"><code>sinh</code></a> <span class="blurb">Hyperbolic sine of `x`.</span></li>
+<li><a href="../std/fn.sqrt.html"><code>sqrt</code></a> <span class="blurb">Square root of `x`. Returns NaN if `x` is negative.</span></li>
+<li><a href="../std/fn.sqrtf.html"><code>sqrtf</code></a> <span class="blurb">`float32` version of `sqrt`.</span></li>
+<li><a href="../std/fn.take.html"><code>take</code></a> <span class="blurb">Takes the value behind `from` and leaves `T::default()` in its place.</span></li>
+<li><a href="../std/fn.tan.html"><code>tan</code></a> <span class="blurb">Tangent of `x` (in radians).</span></li>
+<li><a href="../std/fn.tanh.html"><code>tanh</code></a> <span class="blurb">Hyperbolic tangent of `x`.</span></li>
+<li><a href="../std/fn.trunc.html"><code>trunc</code></a> <span class="blurb">Rounds `x` toward zero, dropping the fractional part. `trunc(2.7) == 2.0`, `trunc(-2.7) == -2.0`.</span></li>
+<li><a href="../std/fn.truncf.html"><code>truncf</code></a> <span class="blurb">`float32` version of `trunc`.</span></li>
+<li><a href="../std/fn.zero_alloc.html"><code>zero_alloc</code></a> <span class="blurb">Allocates a zeroed buffer able to hold `nelem` values of type `T` and returns a pointer to its start.</span></li>
 </ul></section>
 </main>
 <footer>Generated by <code>atlas77 docs</code></footer>

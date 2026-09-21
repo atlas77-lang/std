@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,65 +145,98 @@
 <h1><span class="kind">Struct</span> std::map</h1>
 <pre class="code">struct std::map&lt;K, V&gt;</pre>
 <p class="source">Declared in <a href="../files/src-map.atlas.html">src/map.atlas</a></p>
+<p>A hash map from <code>K</code> to <code>V</code>, using Robin Hood open-addressing.</p>
+<p>Keys need to be <code>std::hashable</code> and support <code>operator::equal</code>. All the primitive types do.
+The map owns its keys and values: they are deleted when removed, overwritten or when the map is destroyed.
+The bucket array grows (doubling) once it’s 80% full.</p>
+<pre><code>let m = std::map&lt;int64, std::string&gt;::new();
+m.insert(1, std::string::from_chars("one"));
+let key: int64 = 1;
+if m.contains_key(&amp;key) {
+    let value: *const std::string = m.get(key);
+}
+</code></pre>
+<p>Lookups go through the <code>std::indexable</code> conformance (<code>get</code>/<code>get_mut</code>), see below.</p>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.cap">
 <pre class="code">fun cap(*const this) -&gt; uint64 </pre>
+<p>Returns the number of buckets. Not the number of pairs, see <code>len()</code> for that.</p>
 </div>
 <div class="member" id="method.clear">
 <pre class="code">fun clear(*this) -&gt; unit </pre>
+<p>Deletes every pair, keeping the bucket array allocated at its current capacity.</p>
 </div>
 <div class="member" id="method.contains_key">
 <pre class="code">fun contains_key(*const this, key: *const K) -&gt; bool </pre>
+<p>Returns true if a pair with the given key is in the map.</p>
 </div>
 <div class="member" id="method.insert">
 <pre class="code">fun insert(*this, key: K, value: V) -&gt; unit </pre>
 <p>Insert key/value. If key exists, replaces value.</p>
+<p>When the key already exists, the old value is deleted and the given <code>key</code> is deleted too
+(the one already stored is kept). Grows the bucket array if needed.</p>
 </div>
 <div class="member" id="method.is_empty">
 <pre class="code">fun is_empty(*const this) -&gt; bool </pre>
+<p>Returns true if the map holds no pair.</p>
 </div>
 <div class="member" id="method.len">
 <pre class="code">fun len(*const this) -&gt; uint64 </pre>
+<p>Returns the number of pairs in the map.</p>
 </div>
 <div class="member" id="method.new">
 <pre class="code">fun new() -&gt; std::map&lt;K, V&gt; </pre>
+<p>Creates an empty map with a default capacity of 16 buckets.</p>
 </div>
 <div class="member" id="method.pairs">
 <pre class="code">fun pairs(*const this) -&gt; std::vector&lt;*const std::map_pair&lt;K, V&gt;&gt; </pre>
+<p>Returns a vector of pointers to every pair in the map, in bucket order (so, no particular order).</p>
+<p>The pointers are only valid until the next mutation of the map.</p>
 </div>
 <div class="member" id="method.remove">
 <pre class="code">fun remove(*this, key: *const K) -&gt; bool </pre>
 <p>Remove key if present.</p>
+<p>Returns true if a pair was actually removed. The key and the value are deleted.</p>
 </div>
 <div class="member" id="method.set">
 <pre class="code">fun set(*this, key: K, value: V) -&gt; unit </pre>
+<p>Alias of <code>insert</code>.</p>
 </div>
 <div class="member" id="method.with_capacity">
 <pre class="code">fun with_capacity(cap: uint64) -&gt; std::map&lt;K, V&gt; </pre>
+<p>Creates an empty map with room for <code>cap</code> buckets. Anything under 8 is rounded up to 8.</p>
 </div>
 </section>
 <section>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~map()</pre>
+<p>Deletes every pair still in the map, then frees the bucket array.</p>
 </div>
 </section>
 <section>
 <h2>Conformances</h2>
 <div class="member" id="conformance.std-indexable">
 <pre class="code">extend std::map&lt;K, V&gt; with std::indexable</pre>
+<p>Index a map with a key, giving back a pointer to the matching value or <code>null</code> if the key isn’t in the map.</p>
 <div class="member" id="conformance.std-indexable.type.index_t">
 <pre class="code">type index_t = K</pre>
+<p class="inherited">Documentation inherited from the concept:</p>
+<p>The type used to index the container.</p>
 </div>
 <div class="member" id="conformance.std-indexable.type.index_val_t">
 <pre class="code">type index_val_t = V</pre>
+<p class="inherited">Documentation inherited from the concept:</p>
+<p>The type of the values stored in the container.</p>
 </div>
 <div class="member" id="conformance.std-indexable.method.get">
 <pre class="code">fun get(*const this, idx: std::map&lt;K, V&gt;::index_t) -&gt; *const std::map&lt;K, V&gt;::index_val_t </pre>
+<p>Returns a const pointer to the value stored for <code>idx</code>, or <code>null</code> if the key isn’t in the map.</p>
 </div>
 <div class="member" id="conformance.std-indexable.method.get_mut">
 <pre class="code">fun get_mut(*this, idx: std::map&lt;K, V&gt;::index_t) -&gt; *std::map&lt;K, V&gt;::index_val_t </pre>
+<p>Returns a mutable pointer to the value stored for <code>idx</code>, or <code>null</code> if the key isn’t in the map.</p>
 </div>
 </div>
 </section>

@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,6 +145,18 @@
 <h1><span class="kind">Struct</span> std::directory</h1>
 <pre class="code">struct std::directory</pre>
 <p class="source">Declared in <a href="../files/src-file.atlas.html">src/file.atlas</a></p>
+<p>An open directory, iterated entry by entry with <code>next()</code>.</p>
+<pre><code>let res = std::directory::open(".");
+if res.is_expected() {
+    let dir = res.expected_value();
+    let entry = dir.next();
+    while entry.has_value() {
+        std::println(entry.value().c_str() as str);
+        entry = dir.next();
+    }
+}
+</code></pre>
+<p>NB: <code>.</code> and <code>..</code> are returned like any other entry. The order of the entries is whatever the OS gives.</p>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.next">
@@ -162,6 +174,7 @@ never successfully opened).</p>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~directory()</pre>
+<p>Closes the directory if it’s still open.</p>
 </div>
 </section>
 </main>

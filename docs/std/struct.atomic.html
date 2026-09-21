@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,93 +145,131 @@
 <h1><span class="kind">Struct</span> std::atomic</h1>
 <pre class="code">struct std::atomic&lt;T&gt;</pre>
 <p class="source">Declared in <a href="../files/src-atomic.atlas.html">src/atomic.atlas</a></p>
+<p>Wrapper around an <code>__atomic T</code> type. Only allows primitive types for now.</p>
+<blockquote>
+<p><strong>NB:</strong> It’s a relatively annoying limitation that will be lifted at one point.</p>
+</blockquote>
+<p>This type has been added mostly for convenience as a wrapper around the primitive C11 functions.
+It is <code>#[std::non_copyable]</code>: share it through a pointer (or a <code>std::shared_ptr</code>) instead.</p>
+<pre><code>let counter = std::atomic&lt;int64&gt;::new(0);
+counter.fetch_add(1);
+let value = counter.load(); // 1
+</code></pre>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.compare_exchange_strong">
 <pre class="code">fun compare_exchange_strong(*this, expected: *T, desired: T) -&gt; bool </pre>
+<p>If the current value is equal to <code>*expected</code>, replaces it with <code>desired</code> and returns true.
+Otherwise, writes the current value into <code>*expected</code> and returns false.</p>
+<p>The strong version never fails spuriously, use it when you don’t want to loop.</p>
 </div>
 <div class="member" id="method.compare_exchange_strong_explicit">
 <pre class="code">fun compare_exchange_strong_explicit(*this, expected: *T, desired: T, order: MEMORY_ORDERING) -&gt; bool </pre>
+<p>Same as <code>compare_exchange_strong</code> with the given memory ordering.</p>
+<p>NB: The C11 function takes a success and a failure ordering, here <code>order</code> is passed for both.</p>
 </div>
 <div class="member" id="method.compare_exchange_weak">
 <pre class="code">fun compare_exchange_weak(*this, expected: *T, desired: T) -&gt; bool </pre>
+<p>If the current value is equal to <code>*expected</code>, replaces it with <code>desired</code> and returns true.
+Otherwise, writes the current value into <code>*expected</code> and returns false.</p>
+<p>The weak version may fail spuriously (return false even though the values were equal),
+but can be cheaper on some platforms. Use it inside a loop.</p>
 </div>
 <div class="member" id="method.compare_exchange_weak_explicit">
 <pre class="code">fun compare_exchange_weak_explicit(*this, expected: *T, desired: T, success_order: MEMORY_ORDERING, failure_order: MEMORY_ORDERING) -&gt; bool </pre>
+<p>Same as <code>compare_exchange_weak</code> with a memory ordering for the success and the failure case.</p>
 </div>
 <div class="member" id="method.exchange">
 <pre class="code">fun exchange(*this, val: T) -&gt; T </pre>
+<p>Atomically replaces the current value with <code>val</code> and returns the previous one.</p>
 </div>
 <div class="member" id="method.exchange_explicit">
 <pre class="code">fun exchange_explicit(*this, val: T, order: MEMORY_ORDERING) -&gt; T </pre>
+<p>Atomically replaces the current value with <code>val</code> and returns the previous one, with the given memory ordering.</p>
 </div>
 <div class="member" id="method.fetch_add">
 <pre class="code">fun fetch_add(*this, val: T) -&gt; T 
 	where T: operator::add
 </pre>
+<p>Atomically adds <code>val</code> to the current value and returns the previous value.</p>
 </div>
 <div class="member" id="method.fetch_add_explicit">
 <pre class="code">fun fetch_add_explicit(*this, val: T, order: MEMORY_ORDERING) -&gt; T 
 	where T: operator::add
 </pre>
+<p>Atomically adds <code>val</code> to the current value and returns the previous value, with the given memory ordering.</p>
 </div>
 <div class="member" id="method.fetch_and">
 <pre class="code">fun fetch_and(*this, val: T) -&gt; T 
 	where T: operator::bin_and
 </pre>
+<p>Atomically does a bitwise AND of the current value with <code>val</code> and returns the previous value.</p>
 </div>
 <div class="member" id="method.fetch_and_explicit">
 <pre class="code">fun fetch_and_explicit(*this, val: T, order: MEMORY_ORDERING) -&gt; T 
 	where T: operator::bin_and
 </pre>
+<p>Atomically does a bitwise AND of the current value with <code>val</code> and returns the previous value, with the given memory ordering.</p>
 </div>
 <div class="member" id="method.fetch_or">
 <pre class="code">fun fetch_or(*this, val: T) -&gt; T 
 	where T: operator::bin_or
 </pre>
+<p>Atomically does a bitwise OR of the current value with <code>val</code> and returns the previous value.</p>
 </div>
 <div class="member" id="method.fetch_or_explicit">
 <pre class="code">fun fetch_or_explicit(*this, val: T, order: MEMORY_ORDERING) -&gt; T 
 	where T: operator::bin_or
 </pre>
+<p>Atomically does a bitwise OR of the current value with <code>val</code> and returns the previous value, with the given memory ordering.</p>
 </div>
 <div class="member" id="method.fetch_sub">
 <pre class="code">fun fetch_sub(*this, val: T) -&gt; T 
 	where T: operator::sub
 </pre>
+<p>Atomically subtracts <code>val</code> from the current value and returns the previous value.</p>
 </div>
 <div class="member" id="method.fetch_sub_explicit">
 <pre class="code">fun fetch_sub_explicit(*this, val: T, order: MEMORY_ORDERING) -&gt; T 
 	where T: operator::sub
 </pre>
+<p>Atomically subtracts <code>val</code> from the current value and returns the previous value, with the given memory ordering.</p>
 </div>
 <div class="member" id="method.fetch_xor">
 <pre class="code">fun fetch_xor(*this, val: T) -&gt; T 
 	where T: operator::bin_xor
 </pre>
+<p>Atomically does a bitwise XOR of the current value with <code>val</code> and returns the previous value.</p>
 </div>
 <div class="member" id="method.fetch_xor_explicit">
 <pre class="code">fun fetch_xor_explicit(*this, val: T, order: MEMORY_ORDERING) -&gt; T 
 	where T: operator::bin_xor
 </pre>
+<p>Atomically does a bitwise XOR of the current value with <code>val</code> and returns the previous value, with the given memory ordering.</p>
 </div>
 <div class="member" id="method.is_lock_free">
 <pre class="code">fun is_lock_free(*const this) -&gt; bool </pre>
+<p>Returns true if operations on this atomic don’t need a lock on the current platform.</p>
 </div>
 <div class="member" id="method.load">
 <pre class="code">fun load(*const this) -&gt; T </pre>
+<p>Atomically reads the current value.</p>
 </div>
 <div class="member" id="method.load_explicit">
 <pre class="code">fun load_explicit(*const this, order: MEMORY_ORDERING) -&gt; T </pre>
+<p>Atomically reads the current value with the given memory ordering.</p>
 </div>
 <div class="member" id="method.new">
 <pre class="code">fun new(val: T) -&gt; std::atomic&lt;T&gt; </pre>
+<p>Creates a new atomic holding <code>val</code>.</p>
 </div>
 <div class="member" id="method.store">
 <pre class="code">fun store(*this, val: T) -&gt; unit </pre>
+<p>Atomically replaces the current value with <code>val</code>.</p>
 </div>
 <div class="member" id="method.store_explicit">
 <pre class="code">fun store_explicit(*this, val: T, order: MEMORY_ORDERING) -&gt; unit </pre>
+<p>Atomically replaces the current value with <code>val</code> with the given memory ordering.</p>
 </div>
 </section>
 </main>

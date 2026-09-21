@@ -1,5 +1,27 @@
+//! `std::copyable`: explicit duplication of a value through `.copy()`.
+
 namespace std {
+    //! Types that can be explicitly duplicated with `.copy()`.
+    //!
+    //! Atlas77 moves values by default, nothing is copied behind your back. When you need a second,
+    //! independent value, the type has to implement this concept and you have to call `copy()` yourself.
+    //!
+    //! The result must be equal to the original: if `operator::equal` is implemented, this should hold true:
+    //! ```
+    //! let a = ...;
+    //! let b = a.copy();
+    //! a == b; // true
+    //! ```
+    //! What "equal" means is up to the type. e.g. `std::shared_ptr<T>::copy()` doesn't duplicate the pointed value,
+    //! it only increments the reference count, but `a == b` still holds true.
+    //!
+    //! All the numeric primitives implement it as a plain bitwise copy.
+    //!
+    //! TODO: This concept could be an auto derive concept for `std::trivially_copyable` type.
+    //! Though, that might introduce "*magic*" that users don't want. Right now you have to write every implementation out.
+    //! It's mostly just thought as a simple way of doing things.
     public concept copyable {
+        //! Returns a new value equal to `this`. The original is left untouched.
         fun copy(*const this) -> This;
     }
     

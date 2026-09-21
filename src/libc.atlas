@@ -1,43 +1,79 @@
+//! Partial binding to the C standard library. 
+//! 
+//! As of the v0.9, the atlas77 compiler heavily uses the C standard library to perform most operation.
+//! This file define all the currently used C std functions used in the Atlas77 std. It's mostly a 
+//! convenience namespace, and doesn't try to support all functions and type of the actual C std.
+//!
+//! Some function names have been slightly changed for ease of use and readability, but they still map
+//! to the correct C implementation and definition. Such examples could be:
+//! * `get_char` -> `getchar`
+//! * `str_len` -> `strlen`
+//!
+//! > **NB**: In the future, the atlas77 std will try to distance itself from the libc implementation.
+//! > Meaning this will become its own separate library at one point 
+//! > (possibly hosted at [https://github.com/atlas77-lang/libc](https://github.com/atlas77-lang/libc) in the near future)
 namespace libc {
     //! Not really a libc function. Will become a constant later
     //! on when the feature will be added to the compiler.
     #[c_name("__EOF")]
     public extern "C" fun EOF() -> char;
     
+    //! Reads a single character from standard input. Returns `libc::EOF()` once there is nothing left to read.
     #[c_name("getchar")]
     public extern "C" fun get_char() -> char;
+    //! Closes the given file stream. Returns `0` on success.
     #[c_name("fclose")]
     public extern "C" fun fclose(file: *FILE) -> int32;
+    //! Releases memory previously obtained from `malloc`, `calloc` or `realloc`. Passing `null` is a no-op.
     #[c_name("free")]
     public extern "C" fun free<T>(val: *T);
+    //! Allocates `size` bytes of uninitialized memory. Returns `null` on failure.
+    //!
+    //! `size` is in bytes, not in number of `T`. Use `std::alloc<T>()` if you only need a single `T`.
     #[c_name("malloc")]
     public extern "C" fun malloc<T>(size: uint64) -> *T;
+    //! Resizes the buffer behind `ptr` to `size` bytes, moving it if necessary. Returns `null` on failure.
+    //!
+    //! The content of the old buffer is preserved up to the smaller of the old and new sizes.
     #[c_name("realloc")]
     public extern "C" fun realloc<T>(ptr: *T, size: uint64) -> *T;
+    //! Allocates a zeroed buffer of `nelem * elsize` bytes. Returns `null` on failure.
+    //!
+    //! Prefer `std::zero_alloc<T>(nelem)` which fills in `elsize` for you.
     #[c_name("calloc")]
     public extern "C" fun calloc<T>(nelem: uint64, elsize: uint64) -> *T;
+    //! Copies `size` bytes from `src` to `dest` and returns `dest`. The two buffers must not overlap.
     #[c_name("memcpy")]
     public extern "C" fun memcpy<T>(dest: *T, src: *const T, size: uint64) -> *T;
 
     // Opaque type
     // TODO: Add `#[opaque]`
+    //! Opaque C file stream. You never build one yourself, `fopen` hands you a pointer to it.
     #[c_name("FILE")]
     public extern "C" struct FILE {}
 
+    //! Opens the file at `path` with the given C mode string (`"r"`, `"w"`, `"a"`, `"r+"`...). Returns `null` on failure, in which case `errno` is set.
     #[c_name("fopen")]
     public extern "C" fun fopen(path: *const uint8, mode: *const uint8) -> *libc::FILE;
+    //! Reads up to `nmemb` items of `size` bytes each from `f` into `buf`. Returns the number of items actually read.
     #[c_name("fread")]
     public extern "C" fun fread(buf: *uint8, size: uint64, nmemb: uint64, f: *libc::FILE) -> uint64;
+    //! Writes `nmemb` items of `size` bytes each from `buf` into `f`. Returns the number of items actually written.
     #[c_name("fwrite")]
     public extern "C" fun fwrite(buf: *const uint8, size: uint64, nmemb: uint64, f: *libc::FILE) -> uint64;
+    //! Closes the given file stream. Returns `0` on success.
     #[c_name("fclose")]
     public extern "C" fun fclose(f: *libc::FILE) -> int32;
+    //! Forces any buffered output of `f` to be written out. Returns `0` on success.
     #[c_name("fflush")]
     public extern "C" fun fflush(f: *libc::FILE) -> int32;
+    //! Moves the position of `f` by `offset` bytes relative to `whence` (`0` = start, `1` = current position, `2` = end). Returns `0` on success.
     #[c_name("fseek")]
     public extern "C" fun fseek(f: *libc::FILE, offset: int64, whence: int32) -> int32;
+    //! Returns the current position of `f` in bytes, or `-1` on failure.
     #[c_name("ftell")]
     public extern "C" fun ftell(f: *libc::FILE) -> int64;
+    //! Returns a non-zero value once the end of `f` has been reached.
     #[c_name("feof")]
     public extern "C" fun feof(f: *libc::FILE) -> int32;
 
@@ -51,16 +87,24 @@ namespace libc {
     #[c_name("tolower")]
     public extern "C" fun to_lower(c: uint8) -> uint8;
 
+    //! Compares the first `size` bytes of `a` and `b`. Returns `0` if they are equal, a negative value if `a` is lower, a positive one otherwise.
     #[c_name("memcmp")]
     public extern "C" fun mem_cmp(a: *const uint8, b: *const uint8, size: uint64) -> int32;
 
     // I can't use C macro, so I have a small wrapper around it
     // Named c_errno inside of atlas77.h
+    //! Returns the current value of the C `errno`. Set by most libc functions when they fail.
+    //!
+    //! `errno` is a macro in C, so this goes through a small wrapper named `c_errno` inside of `atlas77.h`.
     #[c_name("c_errno")]
     public extern "C" fun errno() -> int32;
+    //! Returns a human readable message for the given error code (usually the value of `errno()`).
     #[c_name("strerror")]
     public extern "C" fun str_error(errno: int32) -> *const uint8;
 
+    //! Writes `val` into `s` following the C `format` string, writing at most `size` bytes. Returns the number of bytes that would have been written if `size` was big enough.
+    //!
+    //! Passing `null` and `0` lets you measure how big the buffer needs to be. Only a single value can be formatted at once for now.
     #[c_name("snprintf")]
     public extern "C" fun snprintf<T>(s: *uint8, size: uint64, format: *const uint8, val: T) -> int32;
 }

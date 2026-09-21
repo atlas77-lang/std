@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,19 +145,23 @@
 <h1><span class="kind">Struct</span> std::duration</h1>
 <pre class="code">struct std::duration</pre>
 <p class="source">Declared in <a href="../files/src-time.atlas.html">src/time.atlas</a></p>
+<p>A length of time, in nanoseconds. Can be negative.</p>
 <section>
 <h2>Fields</h2>
 <div class="member" id="field.ns">
 <pre class="code">ns: int64</pre>
+<p>Length of the duration in nanoseconds</p>
 </div>
 </section>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.seconds">
 <pre class="code">fun seconds(*const this) -&gt; float64 </pre>
+<p>Returns the duration as a number of seconds, with the fractional part.</p>
 </div>
 <div class="member" id="method.since">
 <pre class="code">fun since(instant: std::instant) -&gt; std::duration </pre>
+<p>Returns the time elapsed between <code>instant</code> and now. Same as <code>instant.elapsed()</code>.</p>
 </div>
 </section>
 </main>

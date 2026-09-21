@@ -1,19 +1,43 @@
+//! `std::iterator` and `std::iterable`: yielding values one at a time. Nothing implements them yet.
+
 import "optional.atlas";
 
 namespace std {
     // TODO: Split this into two iterators:
     // iterator & peekable_iterator that is "super concept" of iterator and allow peek()
+    //! Something that yields values one at a time, until it runs out.
+    //!
+    //! `next()` returns an empty `std::optional` once the iterator is exhausted.
+    //!
+    //! ```
+    //! let item = it.next();
+    //! while item.has_value() {
+    //!     // use item.value()
+    //!     item = it.next();
+    //! }
+    //! ```
+    //!
+    //! NB: Nothing in the std implements it yet. `std::directory::next` follows the same shape but doesn't conform to it.
     public concept iterator {
+        //! The type of the values yielded by the iterator.
         type iter_item_t;
+        //! Advances the iterator and returns the next value, or an empty optional if there is none left.
         fun next(*this) -> std::optional<This::iter_item_t>;
+        //! Returns a pointer to the next value without advancing, or an empty optional if there is none left.
         fun peek(*const this) -> std::optional<*const This::iter_item_t>;
         // Potentially useless function somewhat.
         // .next().is_empty() check could be enough
+        //! Returns true if a call to `next()` would yield a value.
         fun has_next(*const this) -> bool;
     }
     // TODO: Add a way to differentiate between iter/iter_mut/into_iter like Rust does
+    //! Something that can produce a `std::iterator` over its content.
+    //!
+    //! NB: Nothing in the std implements it yet.
     public concept iterable {
+        //! The type of the iterator returned by `iter()`. Should implement `std::iterator`.
         type iterator_t;
+        //! Returns a new iterator over the content of `this`.
         fun iter(*this) -> This::iterator_t;
     }
 }

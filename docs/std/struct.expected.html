@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -151,14 +151,22 @@
 <li>Query with <code>is_expected()</code> / <code>is_unexpected()</code>.</li>
 <li>Access with <code>expected_value()</code> / <code>unexpected_value()</code> or use
 <code>expected_value_or(default)</code>.</li>
+<li>Every accessor consumes the expected: once you took the value (or the error) out, the destructor won’t touch it.</li>
 </ul>
+<pre><code>let res = std::file::read_to_string("foo.txt");
+if res.is_unexpected() {
+    let err: std::string = res.unexpected_value();
+} else {
+    let content: std::string = res.expected_value();
+}
+</code></pre>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.expect">
 <pre class="code">fun expect(data: T) -&gt; std::expected&lt;T, E&gt; </pre>
 <p>Construct a successful <code>expected</code> containing <code>data</code>.</p>
-<p>Example:
-let e = std::expected&lt;int64, string&gt;::expect(42);</p>
+<pre><code>let e = std::expected&lt;int64, std::string&gt;::expect(42);
+</code></pre>
 </div>
 <div class="member" id="method.expected_value">
 <pre class="code">fun expected_value(*this) -&gt; T </pre>
@@ -180,8 +188,8 @@ let e = std::expected&lt;int64, string&gt;::expect(42);</p>
 <div class="member" id="method.unexpected">
 <pre class="code">fun unexpected(error: E) -&gt; std::expected&lt;T, E&gt; </pre>
 <p>Construct a failing <code>expected</code> containing <code>error</code>.</p>
-<p>Example:
-let e = std::expected&lt;int64, string&gt;::unexpected(“oops”);</p>
+<pre><code>let e = std::expected&lt;int64, std::string&gt;::unexpected(std::string::from_chars("oops"));
+</code></pre>
 </div>
 <div class="member" id="method.unexpected_value">
 <pre class="code">fun unexpected_value(*this) -&gt; E </pre>
@@ -197,6 +205,7 @@ let e = std::expected&lt;int64, string&gt;::unexpected(“oops”);</p>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~expected()</pre>
+<p>Drops whichever of the value or the error is still held. Does nothing if it has already been taken out.</p>
 </div>
 </section>
 </main>

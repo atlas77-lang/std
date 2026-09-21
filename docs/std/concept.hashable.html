@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,10 +145,16 @@
 <h1><span class="kind">Concept</span> std::hashable</h1>
 <pre class="code">concept std::hashable</pre>
 <p class="source">Declared in <a href="../files/src-concepts-hashable.atlas.html">src/concepts/hashable.atlas</a></p>
+<p>Types that can be reduced to a <code>uint64</code> hash. Required for the keys of a <code>std::map&lt;K, V&gt;</code>.</p>
+<p>Two equal values must produce the same hash. The primitives simply cast themselves to <code>uint64</code>,
+which is as cheap as it gets and good enough for the Robin Hood map, but says nothing about the
+quality of the distribution.</p>
+<p>NB: <code>str</code> and <code>std::string</code> don’t implement it yet, so they can’t be used as map keys for now.</p>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.hash">
 <pre class="code">fun hash(*const this) -&gt; uint64 </pre>
+<p>Returns the hash of <code>this</code>. Must be the same for two values that compare equal.</p>
 </div>
 </section>
 <section>

@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,11 +145,14 @@
 <h1><span class="kind">Struct</span> std::weak_ptr</h1>
 <pre class="code">struct std::weak_ptr&lt;T&gt;</pre>
 <p class="source">Declared in <a href="../files/src-shared_ptr.atlas.html">src/shared_ptr.atlas</a></p>
-<p>NB: Not properly implemented just yet…</p>
+<p>Not really implemented. This type doesn’t work and should <strong>NOT</strong> be used at any cost rn.</p>
+<p>The idea is the usual one: a non owning observer of a <code>std::shared_ptr</code> value, which can tell whether
+the value is still alive without keeping it alive. None of that exists yet.</p>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.copy">
 <pre class="code">fun copy(*this) -&gt; std::weak_ptr&lt;T&gt; </pre>
+<p>Doesn’t return anything yet. Don’t call it.</p>
 </div>
 </section>
 </main>

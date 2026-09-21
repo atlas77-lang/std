@@ -1,14 +1,16 @@
-//! std::string library for Atlas `std::string`
+//! Owned, heap allocated, null terminated string: `std::string`.
 //!
 //! Provides a std::string struct with various string manipulation functions.
 //!
 //! Invariant: `data` always points to a buffer of `capacity + 1` bytes, and
 //! `data[len] == '\0'` holds after every constructor and every method that
-//! mutates the string. `capacity` counts usable content bytes only -- it
+//! mutates the string. `capacity` counts usable content bytes only, it
 //! never includes the reserved terminator slot. Because every method that
 //! touches `data`/`len`/`capacity` re-establishes this before returning,
 //! `c_str()` never needs to lazily patch or reallocate anything: it's a
 //! plain, non-mutating accessor.
+//!
+//! > **NB**: `std::string` is a bag of bytes. It doesn't know anything about UTF-8, `len()` is a byte count.
 
 // import "vector";
 // import "iter";
@@ -20,7 +22,16 @@ import "reflection.atlas";
 
 
 namespace std {
-    //! Bootiful std::string type
+    //! Owned, growable, null terminated byte string.
+    //!
+    //! The buffer is always null terminated, so `c_str()` can be handed to any C function at no cost.
+    //! Methods returning a `std::string` always return a fresh allocation, never a view into `this`.
+    //!
+    //! ```
+    //! let s = std::string::from_chars("Hello");
+    //! s.push_str(", World!");
+    //! std::println(s.c_str() as str);
+    //! ```
     public struct string {
       private:
         //! Should always be null terminated
@@ -33,7 +44,7 @@ namespace std {
         //! `copy_len` bytes from `src` into it (pass `null`/0 to skip), and
         //! terminates it. `content_capacity` must be >= `copy_len`. This is
         //! the one place that decides the physical allocation size, so every
-        //! constructor below routes through it -- there's only one spot that
+        //! constructor below routes through it, there's only one spot that
         //! can get the `+1` wrong.
         fun alloc_terminated(content_capacity: uint64, src: *const uint8, copy_len: uint64) -> std::string {
             let data = std::zero_alloc<uint8>(content_capacity + 1);
@@ -66,37 +77,47 @@ namespace std {
         }
 
       public:
+        //! Creates an empty string. Same as `new()`, exists to satisfy `std::default`.
         fun default() -> std::string {
             return std::string::alloc_terminated(0, null, 0);
         }
+        //! Creates an empty string. It still allocates a single byte for the terminator.
         fun new() -> std::string  {
             // No separate "unallocated" state -- keeping exactly one
             // representation of "empty" is what makes the invariant provable.
             return std::string::alloc_terminated(0, null, 0);
         }
+        //! Returns an independent copy of this string, with the same content and capacity.
         fun copy(*const this) -> std::string {
             return std::string::alloc_terminated(this->capacity, this->data, this->len);
         }
+        //! Frees the underlying buffer.
         ~string() {
             if this->data != null {
                 libc::free(this->data);
             }
         }
         //! Creates a new `std::string` from a null-terminated C string.
+        //!
+        //! The bytes are copied, the string doesn't keep a reference to `s_`.
         fun from_chars(s_: *const uint8) -> std::string {
             let len = libc::str_len(s_);
             return std::string::alloc_terminated(len, s_, len);
         }
         //! Creates a new `std::string` with the specified capacity.
+        //!
+        //! The string is empty, `capacity` only tells how many bytes can be pushed before a reallocation happens.
         fun with_capacity(capacity: uint64) -> std::string {
             return std::string::alloc_terminated(capacity, null, 0);
         }
-        //! Returns the length of the string.
+        //! Returns the length of the string, in bytes, not counting the terminator.
         fun len(*const this) -> uint64 {
             return this->len;
         }
         //! Returns a pointer to the string's data. Always valid, always
-        //! NUL-terminated at `data[len]` -- a plain accessor, nothing more.
+        //! NUL-terminated at `data[len]`, a plain accessor, nothing more.
+        //!
+        //! The pointer is only valid until the next mutation of the string.
         fun c_str(*const this) -> *const uint8 {
             return this->data;
         }
@@ -109,10 +130,11 @@ namespace std {
         fun is_empty(*const this) -> bool {
             return this->len == 0 || this->data == null || this->data[0] == ('\0' as uint8);
         }
-        //! Returns a string slice
+        //! Returns a string slice. Same as `c_str()`.
         fun to_chars(*const this) -> *const uint8 {
             return this->data;
         }
+        //! Returns true if `c` is a space, a tab, a newline or a carriage return.
         // TODO: Add that with `extend char {}`
         fun is_whitespace(c: uint8) -> bool {
             let is_whitespace = c == ' ' as uint8;
@@ -122,7 +144,7 @@ namespace std {
             return is_whitespace || is_tab || is_newline || is_carriage;
         }
         //! Returns a new `std::string` with leading and trailing whitespace removed.
-        //! Always an independent allocation -- never a view into `this`,
+        //! Always an independent allocation, never a view into `this`,
         //! so it owns its own terminator and its own lifetime.
         fun trim(*const this) -> std::string {
             let start: uint64 = 0;
@@ -136,7 +158,7 @@ namespace std {
             let trimmed_len = end - start;
             return std::string::alloc_terminated(trimmed_len, this->data + start, trimmed_len);
         }
-        //! Returns a new `std::string` converted to uppercase.
+        //! Returns a new `std::string` converted to uppercase. Only ASCII letters are affected.
         fun to_upper(*const this) -> std::string {
             let s_ = this->copy();
             let i: uint64 = 0;
@@ -147,7 +169,7 @@ namespace std {
             }
             return s_;
         }
-        //! Returns a new `std::string` converted to lowercase.
+        //! Returns a new `std::string` converted to lowercase. Only ASCII letters are affected.
         fun to_lower(*const this) -> std::string {
             let s_ = this->copy();
             let i: uint64 = 0;
@@ -169,6 +191,8 @@ namespace std {
             return result;
         }
         //! Appends a string slice to the end of this string.
+        //!
+        //! `s` must be null terminated. Grows the buffer if needed.
         fun push_str(*this, s: *const uint8) {
             let s_len = libc::str_len(s);
             let new_len = this->len + s_len;
@@ -178,6 +202,8 @@ namespace std {
             this->data[new_len] = '\0' as uint8;
         }
         //! Appends a single char to the end of this string.
+        //!
+        //! Grows the buffer if needed.
         fun push_char(*this, ch: char) {
             let new_len = this->len + 1;
             this->grow_to(new_len);
@@ -185,6 +211,9 @@ namespace std {
             this->len = new_len;
             this->data[new_len] = '\0' as uint8;
         }
+        //! Returns a new `std::string` holding the bytes in `[start, end)`.
+        //!
+        //! Panics if `start > end` or if `end` is past the end of the string.
         fun substr(*const this, start: uint64, end: uint64) -> std::string {
             if start > end || end > this->len {
                 std::panic("Invalid substring range");
@@ -192,6 +221,11 @@ namespace std {
             let sub_len = end - start;
             return std::string::alloc_terminated(sub_len, this->data + start, sub_len);
         }
+        //! Formats a primitive value into a new `std::string`.
+        //!
+        //! Integers, floats, `char` and `bool` are supported. The formatting goes through `libc::snprintf`,
+        //! so floats are printed the way C's `%f` prints them. `str` isn't supported yet, use `from_chars` instead.
+        //! Prefer `value.to_string()` through the `std::to_string` concept, which calls this for you.
         fun to_string<T: std::primitive>(val: T) -> This {
             let format: *const uint8 = null;
 
@@ -243,6 +277,7 @@ namespace std {
             return result;
         }
 
+        //! Two strings are equal if they have the same length and the same bytes.
         operator equal(*const this, other: *const This) -> bool {
             if this->len != other->len {
                 return false;
@@ -252,6 +287,7 @@ namespace std {
             }
             return libc::mem_cmp(this->data, other->data, this->len) == 0;
         }
+        //! The opposite of `operator::equal`.
         operator not_equal(*const this, other: *const This) -> bool {
             if this->len != other->len {
                 return true;

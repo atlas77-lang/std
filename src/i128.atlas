@@ -1,16 +1,28 @@
+//! 128 bit integers built out of two 64 bit halves.
+//!
+//! **Work in progress**: only `uint128`'s `+` and `-` are implemented. Every other operator is a stub
+//! returning `default()`, and the comparison operators don't even return a `bool` yet.
+//!
+//! NB: Not imported by `lib.atlas` yet.
+
 import "optional.atlas";
 
+//! Unsigned 128 bit integer. Only `+`, `-`, `default()` and the `to_64bits` helpers work for now.
 public struct uint128 {
   public:
+    //! Upper 64 bits
     high: uint64;
+    //! Lower 64 bits
     low: uint64;
   public:
+    //! Returns zero.
     fun default() -> uint128 {
         return uint128 {
             .high = 0,
             .low = 0
         };
     }
+    //! `a + b`, with carry propagation from the low half to the high one. Wraps around on overflow.
     operator add(*const this, other: *const uint128) -> uint128 {
         let low = this->low + other->low;
         let carry: uint64 = 0;
@@ -22,6 +34,7 @@ public struct uint128 {
             .high = this->high + other->high + carry
         };
     }
+    //! `a - b`, with borrow propagation from the low half to the high one. Wraps around on underflow.
     operator sub(*const this, other: *const uint128) -> uint128 {
         let borrow: uint64 = 0;
         let low = this->low - other->low;
@@ -93,6 +106,7 @@ public struct uint128 {
         return uint128::default();
     }
     
+    //! Returns the value as a 64 bit integer if it fits, an empty optional otherwise.
     // TODO: Find a better name
     fun to_64bits(*const this) -> std::optional<uint64> {
         if this->high != 0
@@ -101,23 +115,29 @@ public struct uint128 {
         }
         return std::optional<uint64>::of(this->low);
     }
+    //! Returns the lower 64 bits, silently dropping the upper ones.
     fun to_64bits_unchecked(*const this) -> uint64 {
         return this->low;
     }
 }
 
 #[std::trivially_copyable]
+//! Signed 128 bit integer. Only `neg`, `default()` and the `to_64bits` helpers work for now.
 public struct int128 {
   public:
+    //! Upper 64 bits
     high: int64;
+    //! Lower 64 bits
     low: uint64;
   public:
+    //! Returns zero.
     fun default() -> int128 {
         return int128 {
             .high = 0,
             .low = 0
         };
     }
+    //! `-a`. Only negates the high half for now, which isn't correct two's complement.
     operator neg(*const this) -> int128 {
         return int128 {
             .high = -this->high,
@@ -192,6 +212,7 @@ public struct int128 {
         return int128::default();
     }
     
+    //! Returns the value as a 64 bit integer if it fits, an empty optional otherwise.
     // TODO: Find a better name
     fun to_64bits(*const this) -> std::optional<int64> {
         if this->high != 0
@@ -200,6 +221,7 @@ public struct int128 {
         }
         return std::optional<int64>::of(this->low as int64);
     }
+    //! Returns the lower 64 bits, silently dropping the upper ones.
     fun to_64bits_unchecked(*const this) -> int64 {
         return this->low as int64;
     }

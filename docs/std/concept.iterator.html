@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,22 +145,35 @@
 <h1><span class="kind">Concept</span> std::iterator</h1>
 <pre class="code">concept std::iterator</pre>
 <p class="source">Declared in <a href="../files/src-concepts-iterator.atlas.html">src/concepts/iterator.atlas</a></p>
+<p>Something that yields values one at a time, until it runs out.</p>
+<p><code>next()</code> returns an empty <code>std::optional</code> once the iterator is exhausted.</p>
+<pre><code>let item = it.next();
+while item.has_value() {
+    // use item.value()
+    item = it.next();
+}
+</code></pre>
+<p>NB: Nothing in the std implements it yet. <code>std::directory::next</code> follows the same shape but doesn’t conform to it.</p>
 <section>
 <h2>Associated types</h2>
 <div class="member" id="type.iter_item_t">
 <pre class="code">type iter_item_t</pre>
+<p>The type of the values yielded by the iterator.</p>
 </div>
 </section>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.next">
 <pre class="code">fun next(*this) -&gt; std::optional&lt;This::iter_item_t&gt; </pre>
+<p>Advances the iterator and returns the next value, or an empty optional if there is none left.</p>
 </div>
 <div class="member" id="method.peek">
 <pre class="code">fun peek(*const this) -&gt; std::optional&lt;*const This::iter_item_t&gt; </pre>
+<p>Returns a pointer to the next value without advancing, or an empty optional if there is none left.</p>
 </div>
 <div class="member" id="method.has_next">
 <pre class="code">fun has_next(*const this) -&gt; bool </pre>
+<p>Returns true if a call to <code>next()</code> would yield a value.</p>
 </div>
 </section>
 </main>

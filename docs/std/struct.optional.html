@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -150,35 +150,47 @@
 <li>When <code>has_value</code> is true, <code>data.value</code> is valid and will be dropped
 by the destructor.</li>
 <li>Create instances via <code>optional::of(value)</code> or <code>optional::empty()</code>.</li>
+<li>Most accessors consume the optional: once you took the value out, it’s empty.</li>
 </ul>
+<pre><code>let opt = std::optional&lt;int64&gt;::of(42);
+if opt.has_value() {
+    let n = opt.value(); // opt is now empty
+}
+</code></pre>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.empty">
 <pre class="code">fun empty() -&gt; std::optional&lt;T&gt; </pre>
 <p>Construct an empty <code>optional&lt;T&gt;</code> with no value.</p>
-<p>Example:
-let none = optional<int64>::empty();</p>
+<pre><code>let none = std::optional&lt;int64&gt;::empty();
+</code></pre>
 </div>
 <div class="member" id="method.get">
 <pre class="code">fun get(*const this) -&gt; *const T </pre>
+<p>Returns a pointer to the contained value without consuming the optional.</p>
+<p>Nothing is checked: calling this on an empty optional gives you a pointer to garbage.
+Check <code>has_value()</code> first.</p>
 </div>
 <div class="member" id="method.get_value">
 <pre class="code">fun get_value(*const this) -&gt; *const T </pre>
+<p>Same as <code>get()</code>. Returns a pointer to the contained value without consuming the optional.</p>
+<p>Nothing is checked: calling this on an empty optional gives you a pointer to garbage.</p>
 </div>
 <div class="member" id="method.has_value">
 <pre class="code">fun has_value(*const this) -&gt; bool </pre>
 <p>Returns true if a value is present.</p>
-<p>Example:
-if (opt.has_value()) { println(“has value”); }</p>
+<pre><code>if opt.has_value() { std::println("has value"); }
+</code></pre>
 </div>
 <div class="member" id="method.is_empty">
 <pre class="code">fun is_empty(*const this) -&gt; bool </pre>
+<p>Returns true if no value is present. The opposite of <code>has_value()</code>.</p>
 </div>
 <div class="member" id="method.of">
 <pre class="code">fun of(data: T) -&gt; std::optional&lt;T&gt; </pre>
 <p>Construct an <code>optional&lt;T&gt;</code> containing <code>data</code>.</p>
-<p>Example:
-let some = optional<int64>::of(42);</p>
+<pre><code>let some = std::optional&lt;int64&gt;::of(42);
+</code></pre>
 </div>
 <div class="member" id="method.value">
 <pre class="code">fun value(*this) -&gt; T </pre>
@@ -189,9 +201,9 @@ Consider using <code>value_or(default)</code> to avoid panics.</p>
 <div class="member" id="method.value_or">
 <pre class="code">fun value_or(*this, default: T) -&gt; T </pre>
 <p>Consume the optional and return the contained value or <code>default</code> if empty.</p>
-<p>Example:
-let opt = optional<int64>::empty();
-let n = opt.value_or(0);</p>
+<pre><code>let opt = std::optional&lt;int64&gt;::empty();
+let n = opt.value_or(0);
+</code></pre>
 </div>
 </section>
 <section>

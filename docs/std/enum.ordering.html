@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,16 +145,24 @@
 <h1><span class="kind">Enum</span> std::ordering</h1>
 <pre class="code">enum std::ordering</pre>
 <p class="source">Declared in <a href="../files/src-concepts-comparable.atlas.html">src/concepts/comparable.atlas</a></p>
+<p>Result of a comparison between two values: <code>LESS</code>, <code>EQUAL</code> or <code>GREATER</code>.</p>
+<p>The values of the variants allow for fun optimization.
+Most primitive types implement the <code>std::comparable::compare</code> method like this:
+<code>return ((*this &gt; *other) as int32 - (*this &lt; *other) as int32) as uint64</code>
+which gives <code>-1</code>, <code>0</code> or <code>1</code> without a single branch.</p>
 <section>
 <h2>Variants</h2>
 <div class="member" id="variant.less">
 <pre class="code">LESS = 18446744073709551615</pre>
+<p>Represent the less variant (its actual value is -1)</p>
 </div>
 <div class="member" id="variant.equal">
 <pre class="code">EQUAL = 0</pre>
+<p>Represent the equal variant</p>
 </div>
 <div class="member" id="variant.greater">
 <pre class="code">GREATER = 1</pre>
+<p>Represent the greater variant</p>
 </div>
 </section>
 </main>

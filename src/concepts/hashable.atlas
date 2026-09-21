@@ -1,7 +1,17 @@
+//! `std::hashable`: reducing a value to a `uint64`, as needed by `std::map<K, V>` keys.
+
 namespace std {
     // TODO: The result of a hash might be something different than uint64
     // Might be worth introducing `type hashed_val_t`
+    //! Types that can be reduced to a `uint64` hash. Required for the keys of a `std::map<K, V>`.
+    //!
+    //! Two equal values must produce the same hash. The primitives simply cast themselves to `uint64`,
+    //! which is as cheap as it gets and good enough for the Robin Hood map, but says nothing about the
+    //! quality of the distribution.
+    //!
+    //! NB: `str` and `std::string` don't implement it yet, so they can't be used as map keys for now.
     public concept hashable {
+        //! Returns the hash of `this`. Must be the same for two values that compare equal.
         fun hash(*const this) -> uint64;
     }
     extend int8 with std::hashable {

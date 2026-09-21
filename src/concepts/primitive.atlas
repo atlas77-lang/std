@@ -6,6 +6,11 @@
 namespace std {
     // TODO: Make this concepts locked. Nobody should be able
     // to extend their own types with std::primitive
+    //! Marker concept for the built-in types: every integer, both floats, `char`, `bool` and `str`.
+    //!
+    //! It has no method. It only exists to constrain generics to types the compiler knows how to handle directly,
+    //! e.g. `std::atomic<T: std::primitive>` or `std::string::to_string<T: std::primitive>`.
+    //! You shouldn't extend your own types with it.
     public concept primitive {}
     extend int8 with std::primitive {}
     extend int16 with std::primitive {}

@@ -16,6 +16,22 @@ import "string.atlas";
 import "time.atlas";
 import "vector.atlas";
 
-//! Standard library for the atlas77 programming language.
-//! As of today it's still way too unstable...
+//! # The Atlas77 Standard Library
+//! 
+//! It is the base on which all (or at least most) atlas software is built upon.
+//! It defines a minimal set of vital core components like `std::vector<T>`, `std::optional<T>` & `std::expected<T, E>`
+//!
+//! **DISCLAIMER**: This library isn't stable, and will have a lot of breaking changes leading up to the 1.0 release.
+//!
+//! ## What's in there
+//!
+//! * Containers: `std::vector<T>`, `std::map<K, V>`, `std::string`
+//! * Sum types: `std::optional<T>`, `std::expected<T, E>`, `std::either<L, R>`, `std::any`
+//! * Memory: `std::shared_ptr<T>`, `std::atomic<T>`, `std::alloc`/`std::zero_alloc`, `std::ptr`
+//! * Concepts: `std::comparable`, `std::copyable`, `std::default`, `std::hashable`, `std::to_string`, `std::indexable`...
+//! * OS: `std::file`, `std::directory`, `std::instant`/`std::duration`, `std::print`/`std::input`
+//! * Math: rounding, powers, logarithms, trigonometry
+//!
+//! The `libc` namespace holds the raw bindings everything above is built on, and `core` holds what the compiler provides.
+//!
 namespace std {}

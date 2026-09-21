@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,34 +145,62 @@
 <h1><span class="kind">Struct</span> std::any</h1>
 <pre class="code">struct std::any</pre>
 <p class="source">Declared in <a href="../files/src-any.atlas.html">src/any.atlas</a></p>
+<p>A type erased container. It holds a single value of any type <code>T</code>, and only gives it back if you ask for that exact <code>T</code>.</p>
+<p>The value is boxed on the heap, and the <code>std::any</code> remembers both its <code>core::type_info</code> and its destructor,
+so it can be checked and destroyed properly without knowing <code>T</code> anymore.</p>
+<pre><code>let a = std::any::new&lt;int64&gt;(42);
+let wrong = a.get&lt;bool&gt;();  // unexpected(UNEQUIVALENT_CAST)
+let right = a.get&lt;int64&gt;(); // expect(*const int64)
+let owned = a.cast&lt;int64&gt;(); // 42, a is now empty
+</code></pre>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.cast">
 <pre class="code">fun cast(this) -&gt; std::expected&lt;T, std::cast_error&gt; </pre>
+<p>Takes the value out of the container, leaving it empty. Returns a <code>std::cast_error</code> if the held value isn’t a <code>T</code> or was already taken.</p>
+<p>After this call, <code>has_value()</code> returns false and any further <code>cast&lt;T&gt;()</code> returns <code>MOVED_ANY_VALUE</code>.</p>
+<p>TODO: Once the as operator will be overloadable, if the held type isn’t T,
+but can be casted to T, you will be able to get a T type from a U held type.</p>
 </div>
 <div class="member" id="method.get">
 <pre class="code">fun get(*const this) -&gt; std::expected&lt;*const T, std::cast_error&gt; </pre>
+<p>Returns a const pointer to the held value, or a <code>std::cast_error</code> if it isn’t a <code>T</code> or has already been taken out.</p>
+<p>The <code>std::any</code> keeps ownership of the value, the pointer is only valid as long as the <code>std::any</code> lives.</p>
+<p>TODO: Once the as operator will be overloadable, if the held type isn’t T,
+but can be casted to T, you will be able to get a T type from a U held type.</p>
 </div>
 <div class="member" id="method.get_mut">
 <pre class="code">fun get_mut(*this) -&gt; std::expected&lt;*T, std::cast_error&gt; </pre>
+<p>Returns a mutable pointer to the held value, or a <code>std::cast_error</code> if it isn’t a <code>T</code> or has already been taken out.</p>
+<p>The <code>std::any</code> keeps ownership of the value, the pointer is only valid as long as the <code>std::any</code> lives.</p>
+<p>TODO: Once the as operator will be overloadable, if the held type isn’t T,
+but can be casted to T, you will be able to get a T type from a U held type.</p>
 </div>
 <div class="member" id="method.has_value">
 <pre class="code">fun has_value(*const this) -&gt; bool </pre>
+<p>Returns true if the <code>std::any</code> still holds a value, false once it has been taken out with <code>cast&lt;T&gt;()</code>.</p>
 </div>
 <div class="member" id="method.new">
 <pre class="code">fun new(value: T) -&gt; std::any </pre>
+<p>Creates a new <code>std::any</code> holding <code>value</code>. The value is moved into a heap allocation owned by the <code>std::any</code>.</p>
 </div>
 <div class="member" id="method.type">
 <pre class="code">fun type(*const this) -&gt; core::type_info </pre>
+<p>Returns the <code>core::type_info</code> of the held type.</p>
 </div>
 <div class="member" id="method.type_id">
 <pre class="code">fun type_id(*const this) -&gt; uint64 </pre>
+<p>Returns the <code>type_id</code> of the held type. Compare it with <code>type_id&lt;T&gt;()</code> to know which type this container is holding.</p>
 </div>
 </section>
 <section>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~any()</pre>
+<p>Destroys then frees the contained value, if there is still one, using the destructor stored at construction time.</p>
+<p><code>std::any</code> can’t call <code>delete</code> on a <code>*unit</code>, so <code>new&lt;T&gt;()</code> stores <code>std::deleter&lt;T&gt;</code> and this calls it back.</p>
+<p>NB: It should be possible to directly store the destructor directly using <code>value.~T</code> or something like that.
+Maybe renaming the destructor with a special case <code>drop()</code> method.</p>
 </div>
 </section>
 </main>

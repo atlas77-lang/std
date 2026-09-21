@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,10 +145,24 @@
 <h1><span class="kind">Concept</span> std::comparable</h1>
 <pre class="code">concept std::comparable</pre>
 <p class="source">Declared in <a href="../files/src-concepts-comparable.atlas.html">src/concepts/comparable.atlas</a></p>
+<p>Types with a total order. Implement <code>compare</code> and every comparison operator comes for free.</p>
+<pre><code>extend my_type with std::comparable {
+    fun compare(*const this, other: *const This) -&gt; std::ordering {
+        return this-&gt;key.compare(&amp;other-&gt;key);
+    }
+}
+// a &lt; b, a == b, a &gt;= b... now all work
+</code></pre>
+<p>TODO: Make all primitive type actually use those overloaded operators,
+but using some kind of <code>__intrinsic_add(a, b)</code>/<code>__intrinsic_equal(a, b)</code>
+So that EVERY operators are just a function call, up until a primitive type</p>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.compare">
 <pre class="code">fun compare(*const this, other: *const This) -&gt; std::ordering </pre>
+<p>The only method that should get implemented. Returns how <code>this</code> compares to <code>other</code>.
+Allows to auto implement all the linked operators
+(equal/not_equal/greater/greater_equal/less/less_equal) automatically.</p>
 </div>
 </section>
 <section>

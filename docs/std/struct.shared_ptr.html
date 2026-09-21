@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,40 +145,69 @@
 <h1><span class="kind">Struct</span> std::shared_ptr</h1>
 <pre class="code">struct std::shared_ptr&lt;T&gt;</pre>
 <p class="source">Declared in <a href="../files/src-shared_ptr.atlas.html">src/shared_ptr.atlas</a></p>
+<p>A pointer to a heap allocated <code>T</code> shared between several owners. The value is destroyed once the last owner is gone.</p>
+<p>Every <code>copy()</code> increments an atomic reference count, every destructor decrements it. When it reaches zero,
+the value’s destructor runs and the memory is freed. The count is atomic, so the pointer can be shared across threads.</p>
+<pre><code>let a = std::shared_ptr&lt;int64&gt;::new(42);
+let b = a.copy();       // use_count() == 2
+let value = *a.get();   // 42
+</code></pre>
+<blockquote>
+<p><strong>NB</strong>: The value itself isn’t protected in any way, only the reference count is. Mutating it through
+<code>get_mut()</code> from several threads at once is a data race.</p>
+</blockquote>
 <section>
 <h2>Methods</h2>
-<div class="member" id="method.copy">
-<pre class="code">fun copy(*const this) -&gt; std::shared_ptr&lt;T&gt; </pre>
-</div>
 <div class="member" id="method.from_raw">
 <pre class="code">fun from_raw(ptr: *T) -&gt; std::shared_ptr&lt;T&gt; </pre>
-<p>Unsafe</p>
+<p>Takes ownership of an already allocated <code>T</code>. Unsafe.</p>
+<p><code>ptr</code> must come from <code>std::alloc&lt;T&gt;()</code>/<code>libc::malloc</code> (or equivalent), since it will be
+destroyed with <code>std::deleter&lt;T&gt;</code> once the last owner is gone. Don’t free it yourself afterwards.</p>
 </div>
 <div class="member" id="method.get">
 <pre class="code">fun get(*const this) -&gt; *const T </pre>
-<p>Unsafe function, and only temporary until references are added back to Atlas77</p>
+<p>Returns a const pointer to the shared value. Unsafe function, and only temporary until references are added back to Atlas77.</p>
+<p>The pointer is only valid as long as at least one <code>std::shared_ptr</code> to the value is alive.</p>
 </div>
 <div class="member" id="method.get_mut">
 <pre class="code">fun get_mut(*const this) -&gt; *T </pre>
-<p>Unsafe function, and only temporary until references are added back to Atlas77</p>
+<p>Returns a mutable pointer to the shared value. Unsafe function, and only temporary until references are added back to Atlas77.</p>
+<p>The pointer is only valid as long as at least one <code>std::shared_ptr</code> to the value is alive.</p>
 </div>
 <div class="member" id="method.get_weak">
 <pre class="code">fun get_weak(*this) -&gt; std::weak_ptr&lt;T&gt; </pre>
+<p>Creates a <code>std::weak_ptr</code> observing the same value. See <code>std::weak_ptr</code> for why you shouldn’t use it yet.</p>
 </div>
 <div class="member" id="method.is_null">
 <pre class="code">fun is_null(*const this) -&gt; bool </pre>
+<p>Returns true if this <code>std::shared_ptr</code> doesn’t point to anything.</p>
 </div>
 <div class="member" id="method.new">
 <pre class="code">fun new(val: T) -&gt; std::shared_ptr&lt;T&gt; </pre>
+<p>Creates a new <code>std::shared_ptr</code> owning <code>val</code>. The value is moved into a fresh heap allocation.</p>
 </div>
 <div class="member" id="method.use_count">
 <pre class="code">fun use_count(*const this) -&gt; int64 </pre>
+<p>Returns the number of <code>std::shared_ptr</code> currently owning the value, or <code>0</code> if this one is null.</p>
 </div>
 </section>
 <section>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~shared_ptr()</pre>
+<p>Decrements the reference count. If this was the last owner, destroys the value and frees the control block.</p>
+</div>
+</section>
+<section>
+<h2>Conformances</h2>
+<div class="member" id="conformance.std-copyable">
+<pre class="code">extend std::shared_ptr&lt;T&gt; with std::copyable</pre>
+<p>Copying a <code>std::shared_ptr</code> doesn’t copy the value, it adds a new owner: the reference count is incremented.</p>
+<div class="member" id="conformance.std-copyable.method.copy">
+<pre class="code">fun copy(*const this) -&gt; std::shared_ptr&lt;T&gt; </pre>
+<p>Returns a new <code>std::shared_ptr</code> to the same value and increments the reference count.</p>
+<p>Panics if the control block is null, which shouldn’t happen.</p>
+</div>
 </div>
 </section>
 </main>

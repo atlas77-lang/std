@@ -1,176 +1,234 @@
-namespace std {
-    //! Math utilities backed by the C standard math library.
+//! Math utilities backed by the C standard math library.
+//!
+//! Most functions come in two flavours: the `float64` one and the `float32` one, the latter with an `f` suffix
+//! (`sqrt`/`sqrtf`, `floor`/`floorf`...). The trigonometric and hyperbolic functions only exist for `float32` for now.
+//! A few integer helpers (`min`, `max`, `pow_i64`) are written in atlas since C has no equivalent.
 
+namespace std {
     // ============================ rounding =============================
 
+    //! Rounds `x` to the nearest integer, halfway cases away from zero. `round(2.5) == 3.0`, `round(-2.5) == -3.0`.
     #[c_name("round")]
     public extern "C" fun round(x: float64) -> float64;
 
+    //! `float32` version of `round`.
     #[c_name("roundf")]
     public extern "C" fun roundf(x: float32) -> float32;
 
+    //! Rounds `x` to the nearest integer, halfway cases away from zero, and returns it as an `int64`.
     #[c_name("llround")]
     public extern "C" fun round_i64(x: float64) -> int64;
 
+    //! Rounds `x` down to the largest integer not greater than `x`. `floor(2.7) == 2.0`, `floor(-2.7) == -3.0`.
     #[c_name("floor")]
     public extern "C" fun floor(x: float64) -> float64;
 
+    //! `float32` version of `floor`.
     #[c_name("floorf")]
     public extern "C" fun floorf(x: float32) -> float32;
 
+    //! Rounds `x` up to the smallest integer not less than `x`. `ceil(2.2) == 3.0`, `ceil(-2.2) == -2.0`.
     #[c_name("ceil")]
     public extern "C" fun ceil(x: float64) -> float64;
 
+    //! `float32` version of `ceil`.
     #[c_name("ceilf")]
     public extern "C" fun ceilf(x: float32) -> float32;
 
+    //! Rounds `x` toward zero, dropping the fractional part. `trunc(2.7) == 2.0`, `trunc(-2.7) == -2.0`.
     #[c_name("trunc")]
     public extern "C" fun trunc(x: float64) -> float64;
 
+    //! `float32` version of `trunc`.
     #[c_name("truncf")]
     public extern "C" fun truncf(x: float32) -> float32;
 
 
     // ============================= basic ===============================
 
+    //! Absolute value of an `int32`.
     #[c_name("abs")]
     public extern "C" fun abs(x: int32) -> int32;
 
+    //! Absolute value of an `int64`.
     #[c_name("llabs")]
     public extern "C" fun abs_i64(x: int64) -> int64;
 
+    //! Absolute value of a `float64`.
     #[c_name("fabs")]
     public extern "C" fun absf64(x: float64) -> float64;
 
+    //! Absolute value of a `float32`.
     #[c_name("fabsf")]
     public extern "C" fun absf(x: float32) -> float32;
 
+    //! Smallest of `x` and `y`. If one of them is NaN, the other one is returned.
     #[c_name("fmin")]
     public extern "C" fun minf64(x: float64, y: float64) -> float64;
 
+    //! `float32` version of `minf64`.
     #[c_name("fminf")]
     public extern "C" fun minf(x: float32, y: float32) -> float32;
 
+    //! Largest of `x` and `y`. If one of them is NaN, the other one is returned.
     #[c_name("fmax")]
     public extern "C" fun maxf64(x: float64, y: float64) -> float64;
 
+    //! `float32` version of `maxf64`.
     #[c_name("fmaxf")]
     public extern "C" fun maxf(x: float32, y: float32) -> float32;
 
+    //! Floating point remainder of `x / y`. The result has the sign of `x`.
     #[c_name("fmod")]
     public extern "C" fun modf64(x: float64, y: float64) -> float64;
 
+    //! `float32` version of `modf64`.
     #[c_name("fmodf")]
     public extern "C" fun modf(x: float32, y: float32) -> float32;
 
+    //! Length of the hypotenuse of a right triangle with sides `x` and `y`, i.e. `sqrt(x * x + y * y)` without the overflow.
     #[c_name("hypot")]
     public extern "C" fun hypotf64(x: float64, y: float64) -> float64;
 
+    //! `float32` version of `hypotf64`.
     #[c_name("hypotf")]
     public extern "C" fun hypotf(x: float32, y: float32) -> float32;
 
+    //! Returns `x` with the sign of `y`.
     #[c_name("copysign")]
     public extern "C" fun copysignf64(x: float64, y: float64) -> float64;
 
+    //! `float32` version of `copysignf64`.
+    //!
+    //! NB: The naming is inconsistent with the rest of the file (no `f` suffix). It will be fixed at one point.
     #[c_name("copysignf")]
     public extern "C" fun copysign(x: float32, y: float32) -> float32;
 
 
     // ========================= powers / roots ==========================
 
+    //! Square root of `x`. Returns NaN if `x` is negative.
     #[c_name("sqrt")]
     public extern "C" fun sqrt(x: float64) -> float64;
 
+    //! `float32` version of `sqrt`.
     #[c_name("sqrtf")]
     public extern "C" fun sqrtf(x: float32) -> float32;
 
+    //! Cube root of `x`. Works for negative values too.
     #[c_name("cbrt")]
     public extern "C" fun cbrt(x: float64) -> float64;
 
+    //! `float32` version of `cbrt`.
     #[c_name("cbrtf")]
     public extern "C" fun cbrtf(x: float32) -> float32;
 
+    //! `x` raised to the power `y`. See `pow_i64` for integers.
     #[c_name("pow")]
     public extern "C" fun pow(x: float64, y: float64) -> float64;
 
+    //! `float32` version of `pow`.
     #[c_name("powf")]
     public extern "C" fun powf(x: float32, y: float32) -> float32;
 
 
     // ========================= exponential / log =======================
 
+    //! `e` raised to the power `x`.
     #[c_name("exp")]
     public extern "C" fun exp(x: float64) -> float64;
 
+    //! `float32` version of `exp`.
     #[c_name("expf")]
     public extern "C" fun expf(x: float32) -> float32;
 
+    //! `2` raised to the power `x`.
     #[c_name("exp2")]
     public extern "C" fun exp2(x: float64) -> float64;
 
+    //! `float32` version of `exp2`.
     #[c_name("exp2f")]
     public extern "C" fun exp2f(x: float32) -> float32;
 
+    //! Natural logarithm (base `e`) of `x`.
     #[c_name("log")]
     public extern "C" fun log(x: float64) -> float64;
 
+    //! `float32` version of `log`.
     #[c_name("logf")]
     public extern "C" fun logf(x: float32) -> float32;
 
+    //! Base 10 logarithm of `x`.
     #[c_name("log10")]
     public extern "C" fun log10(x: float64) -> float64;
 
+    //! `float32` version of `log10`.
     #[c_name("log10f")]
     public extern "C" fun log10f(x: float32) -> float32;
 
+    //! Base 2 logarithm of `x`.
     #[c_name("log2")]
     public extern "C" fun log2(x: float64) -> float64;
 
+    //! `float32` version of `log2`.
     #[c_name("log2f")]
     public extern "C" fun log2f(x: float32) -> float32;
 
 
     // =========================== trigonometry ===========================
 
+    //! Sine of `x` (in radians).
     #[c_name("sinf")]
     public extern "C" fun sin(x: float32) -> float32;
 
+    //! Cosine of `x` (in radians).
     #[c_name("cosf")]
     public extern "C" fun cos(x: float32) -> float32;
 
+    //! Tangent of `x` (in radians).
     #[c_name("tanf")]
     public extern "C" fun tan(x: float32) -> float32;
 
+    //! Arc sine of `x`, in radians in `[-pi/2, pi/2]`. `x` must be in `[-1, 1]`.
     #[c_name("asinf")]
     public extern "C" fun asin(x: float32) -> float32;
 
+    //! Arc cosine of `x`, in radians in `[0, pi]`. `x` must be in `[-1, 1]`.
     #[c_name("acosf")]
     public extern "C" fun acos(x: float32) -> float32;
 
+    //! Arc tangent of `x`, in radians in `[-pi/2, pi/2]`.
     #[c_name("atanf")]
     public extern "C" fun atan(x: float32) -> float32;
 
+    //! Arc tangent of `y / x`, in radians in `[-pi, pi]`, using the signs of both arguments to pick the right quadrant.
     #[c_name("atan2f")]
     public extern "C" fun atan2(y: float32, x: float32) -> float32;
 
 
     // =========================== hyperbolic ============================
 
+    //! Hyperbolic sine of `x`.
     #[c_name("sinhf")]
     public extern "C" fun sinh(x: float32) -> float32;
 
+    //! Hyperbolic cosine of `x`.
     #[c_name("coshf")]
     public extern "C" fun cosh(x: float32) -> float32;
 
+    //! Hyperbolic tangent of `x`.
     #[c_name("tanhf")]
     public extern "C" fun tanh(x: float32) -> float32;
 
+    //! Inverse hyperbolic sine of `x`.
     #[c_name("asinhf")]
     public extern "C" fun asinh(x: float32) -> float32;
 
+    //! Inverse hyperbolic cosine of `x`. `x` must be greater or equal to `1`.
     #[c_name("acoshf")]
     public extern "C" fun acosh(x: float32) -> float32;
 
+    //! Inverse hyperbolic tangent of `x`. `x` must be in `(-1, 1)`.
     #[c_name("atanhf")]
     public extern "C" fun atanh(x: float32) -> float32;
 
@@ -198,6 +256,8 @@ namespace std {
     //! Integer power.
     //! This intentionally uses repeated multiplication instead of C `pow`,
     //! since `pow` is a floating-point operation.
+    //!
+    //! Overflows silently for large results. `pow_i64(x, 0)` is `1` for any `x`.
     public fun pow_i64(x: int64, exponent: uint64) -> int64 {
         let result: int64 = 1;
         let i: uint64 = 0u;

@@ -1,10 +1,18 @@
+//! **Outdated**. A half open range of `uint64`, meant to become iterable. Not imported by `lib.atlas`, don't use it.
+
 import "concepts/iterator.atlas";
 
 namespace std {
+    //! The integers in `[start, end)`.
+    //!
+    //! **Outdated**: the `std::iterable` conformance has an empty `iter()` body, so it can't be iterated yet.
     public struct range {
       public:
+        //! First value of the range, included
         start: uint64;
+        //! End of the range, excluded
         end: uint64;
+        //! Creates the range `[start, end)`.
         fun new(start: uint64, end: uint64) -> This {
             return std::range {
                 .start = start,

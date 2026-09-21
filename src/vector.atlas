@@ -1,16 +1,39 @@
+//! Growable, heap allocated array. The go-to container of the std.
+
 import "io.atlas";
 // We need to import mem to use memcpy for the try_take function
 import "memory.atlas";
 import "optional.atlas";
 
 namespace std {
+    //! A contiguous, growable array of `T`.
+    //!
+    //! Elements are stored in a single heap buffer of `capacity` slots, of which the first `length` are valid.
+    //! Pushing past the capacity reallocates the buffer, doubling its size.
+    //! The destructor deletes every element in `[0, length)` before freeing the buffer.
+    //!
+    //! ```
+    //! let v = std::vector<int64>::with_capacity(4);
+    //! v.push(1);
+    //! v.push(2);
+    //! let last = v.pop(); // 2
+    //! let first = *v.get(0); // 1
+    //! ```
+    //!
+    //! Indexing goes through the `std::indexable` conformance (`get`/`get_mut`), see below.
     public struct vector<T> {
     private:    
         data: *T;
     public:
+        //! Number of valid elements. Prefer `len()`, this field will become private at one point.
         length: uint64;
+        //! Number of slots in the underlying buffer. Prefer `capacity()`, this field will become private at one point.
         capacity: uint64;
 
+        //! Creates a new vector by copying `len` elements starting at `ptr`.
+        //!
+        //! The elements are copied bitwise with `memcpy`, so the vector ends up owning a copy of them.
+        //! Be careful with types that own resources: both the original and the copy will run their destructor.
         fun new(ptr: *T, len: uint64) -> std::vector<T> {
             let data = libc::malloc<T>(sizeof<T>() * len);
             libc::memcpy(data, ptr, sizeof<T>() * len);
@@ -20,6 +43,7 @@ namespace std {
                 .capacity = len, // We assume the capacity is equal to the initial length
             };
         }
+        //! Deletes every element in `[0, length)`, then frees the buffer.
         ~vector() {
             // We shouldn't delete anything outside of data[0..length]
             let i: uint64 = 0u;
@@ -32,6 +56,8 @@ namespace std {
             }
         }
         //! Creates a new std::vector with the specified capacity.
+        //!
+        //! The vector is empty, `capacity` only tells how many elements can be pushed before a reallocation happens.
         fun with_capacity(capacity: uint64) -> std::vector<T> {
             let data = libc::malloc<T>(size_of<T>() * capacity);
             return std::vector<T> {
@@ -44,11 +70,14 @@ namespace std {
         fun len(*const this) -> uint64 {
             return this->length;
         }
+        //! Returns the number of elements the vector can hold before it needs to reallocate.
         fun capacity(*const this) -> uint64 {
             return this->capacity;
         }
         //! Sets the element at `index` to `val`.
         //! Panics on out-of-bounds access.
+        //!
+        //! NB: The previous element is overwritten without running its destructor.
         fun set(*this, index: uint64, val: T) {
             if index >= this->length {
                 std::panic("Index out of bounds");
@@ -57,6 +86,8 @@ namespace std {
         }
 
         //! Appends `val` to the end of the vector, resizing if necessary.
+        //!
+        //! Panics if the reallocation fails.
         fun push(*this, val: T) {
             if this->length >= this->capacity {
                 // Let's use `libc::realloc` to resize the data buffer
@@ -78,6 +109,8 @@ namespace std {
             this->length = this->length + 1u;
         }
         //! Appends all elements from `vec` to the end of this vector, resizing if necessary.
+        //!
+        //! The elements are moved out of `vec`, which is left empty. Panics if the allocation fails.
         fun append(*this, vec: std::vector<T>) {
             let old_length: uint64 = this->length;
             let vec_length: uint64 = vec.length;
@@ -131,6 +164,10 @@ namespace std {
             return popped;
         }
 
+        //! Inserts `val` at index `i`, shifting every element after it to the right.
+        //!
+        //! `i` can be equal to `len()`, in which case this behaves like `push`.
+        //! Panics if `i` is greater than `len()`, or if the reallocation fails.
         fun insert(*this, i: uint64, val: T) {
             if i > this->length {
                 std::panic("Index out of bounds");
@@ -160,6 +197,8 @@ namespace std {
 
         //! Takes an element out of the vector at the specified index,
         //! shifting subsequent elements to the left.
+        //!
+        //! Panics on out-of-bounds access.
         fun take(*this, index: uint64) -> T {
             // Public method to take an element out of the vector
             let result: std::optional<T> = this->try_take(index);
@@ -187,19 +226,20 @@ namespace std {
         }
     }
 
+    //! Index a vector with a `uint64`, giving back a pointer to the element. Out-of-bounds access panics.
     extend std::vector<T> with std::indexable {
         type index_t = uint64;
         type index_val_t = T;
-        // Returns a const reference to the element at `index`.
-        // Panics on out-of-bounds access.
+        //! Returns a const pointer to the element at `index`.
+        //! Panics on out-of-bounds access.
         fun get(*const this, index: This::index_t) -> *const This::index_val_t {
             if index >= this->length {
                 std::panic("Index out of bounds");
             }
             return &this->data[index];
         }
-        // Returns a mutable reference to the element at `index`.
-        // Panics on out-of-bounds access.
+        //! Returns a mutable pointer to the element at `index`.
+        //! Panics on out-of-bounds access.
         fun get_mut(*this, index: This::index_t) -> *This::index_val_t {
             if index >= this->length {
                 std::panic("Index out of bounds");

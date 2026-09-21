@@ -1,11 +1,23 @@
+//! Measuring time. `std::instant` is a point in time, `std::duration` is the distance between two of them.
+//!
+//! Both are nanosecond based and backed by a single `int64`.
+
 namespace std {
     #[c_name("atlas77_instant_now")]
     extern fun atlas77_instant_now() -> int64;
 
+    //! A point in time, expressed in nanoseconds since the Unix epoch (January 1, 1970).
+    //!
+    //! ```
+    //! let start = std::instant::now();
+    //! // ... do something ...
+    //! let elapsed = start.elapsed();
+    //! ```
     public struct instant {
       public:
+        //! Nanoseconds since the Unix epoch
         ns: int64;
-        // Return the amount of nanoseconds since the Unix epoch (January 1, 1970).
+        //! Returns the current time.
         fun now() -> std::instant {
             let ns = std::atlas77_instant_now();
             return std::instant { .ns = ns };
@@ -19,10 +31,13 @@ namespace std {
             return this->ns > other.ns;
         }
         //! Returns the difference between this instant and another instant as a duration.
+        //!
+        //! The result is `this - other`, so it's negative if `other` is after `this`.
         fun difference(*const this, other: std::instant) -> std::duration {
             let elapsed_ns = this->ns - other.ns;
             return std::duration { .ns = elapsed_ns };
         }
+        //! Returns the time elapsed between this instant and now.
         fun elapsed(*const this) -> std::duration {
             let now = std::instant::now();
             let elapsed_ns = now.ns - this->ns;
@@ -30,14 +45,18 @@ namespace std {
         }
     }
 
+    //! A length of time, in nanoseconds. Can be negative.
     public struct duration {
       public:
+        //! Length of the duration in nanoseconds
         ns: int64;
+        //! Returns the time elapsed between `instant` and now. Same as `instant.elapsed()`.
         fun since(instant: std::instant) -> std::duration {
             let now = std::instant::now();
             let elapsed_ns = now.ns - instant.ns;
             return std::duration { .ns = elapsed_ns };
         }
+        //! Returns the duration as a number of seconds, with the fractional part.
         fun seconds(*const this) -> float64 {
             return this->ns as float64 / 1000000000.0;
         }

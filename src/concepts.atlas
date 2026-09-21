@@ -1,7 +1,9 @@
-// DISCLAIMER: This is not the final version of any concepts. 
-// Most of them are subject to change once I allow for generic concepts.
-// e.g. extendable will probably also become generic to allow checks 
-// about the kind of type that This can be extended with
+//! Re-exports every concept of the std. Import this file to get all of them at once.
+//!
+//! DISCLAIMER: This is not the final version of any concepts. 
+//! Most of them are subject to change once I allow for generic concepts.
+//! e.g. extendable will probably also become generic to allow checks 
+//! about the kind of type that This can be extended with
 
 import "concepts/primitive.atlas";
 import "concepts/number.atlas";

@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,31 +145,45 @@
 <h1><span class="kind">Concept</span> std::indexable</h1>
 <pre class="code">concept std::indexable</pre>
 <p class="source">Declared in <a href="../files/src-concepts-indexable.atlas.html">src/concepts/indexable.atlas</a></p>
+<p>Containers that can be looked up by an index (or a key), giving back a pointer to the stored value.</p>
+<p><code>std::vector&lt;T&gt;</code> indexes with a <code>uint64</code> and panics out of bounds, <code>std::map&lt;K, V&gt;</code> indexes with a <code>K</code>
+and returns <code>null</code> when the key is missing. What happens on a bad index is up to the implementor.</p>
+<pre><code>let v = std::vector&lt;int64&gt;::with_capacity(1);
+v.push(42);
+let first: *const int64 = v.get(0);
+*v.get_mut(0) = 43;
+</code></pre>
 <section>
 <h2>Associated types</h2>
 <div class="member" id="type.index_t">
 <pre class="code">type index_t</pre>
+<p>The type used to index the container.</p>
 </div>
 <div class="member" id="type.index_val_t">
 <pre class="code">type index_val_t</pre>
+<p>The type of the values stored in the container.</p>
 </div>
 </section>
 <section>
 <h2>Required methods</h2>
 <div class="member" id="method.get">
 <pre class="code">fun get(*const this, idx: This::index_t) -&gt; *const This::index_val_t </pre>
+<p>Returns a const pointer to the value at <code>idx</code>.</p>
 </div>
 <div class="member" id="method.get_mut">
 <pre class="code">fun get_mut(*this, idx: This::index_t) -&gt; *This::index_val_t </pre>
+<p>Returns a mutable pointer to the value at <code>idx</code>.</p>
 </div>
 </section>
 <section>
 <h2>Implementors</h2>
 <div class="member">
 <pre class="code">extend std::map&lt;K, V&gt; with std::indexable</pre>
+<p>Index a map with a key, giving back a pointer to the matching value or <code>null</code> if the key isn’t in the map.</p>
 </div>
 <div class="member">
 <pre class="code">extend std::vector&lt;T&gt; with std::indexable</pre>
+<p>Index a vector with a <code>uint64</code>, giving back a pointer to the element. Out-of-bounds access panics.</p>
 </div>
 </section>
 </main>

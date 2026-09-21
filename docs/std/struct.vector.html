@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,13 +145,26 @@
 <h1><span class="kind">Struct</span> std::vector</h1>
 <pre class="code">struct std::vector&lt;T&gt;</pre>
 <p class="source">Declared in <a href="../files/src-vector.atlas.html">src/vector.atlas</a></p>
+<p>A contiguous, growable array of <code>T</code>.</p>
+<p>Elements are stored in a single heap buffer of <code>capacity</code> slots, of which the first <code>length</code> are valid.
+Pushing past the capacity reallocates the buffer, doubling its size.
+The destructor deletes every element in <code>[0, length)</code> before freeing the buffer.</p>
+<pre><code>let v = std::vector&lt;int64&gt;::with_capacity(4);
+v.push(1);
+v.push(2);
+let last = v.pop(); // 2
+let first = *v.get(0); // 1
+</code></pre>
+<p>Indexing goes through the <code>std::indexable</code> conformance (<code>get</code>/<code>get_mut</code>), see below.</p>
 <section>
 <h2>Fields</h2>
 <div class="member" id="field.capacity">
 <pre class="code">capacity: uint64</pre>
+<p>Number of slots in the underlying buffer. Prefer <code>capacity()</code>, this field will become private at one point.</p>
 </div>
 <div class="member" id="field.length">
 <pre class="code">length: uint64</pre>
+<p>Number of valid elements. Prefer <code>len()</code>, this field will become private at one point.</p>
 </div>
 </section>
 <section>
@@ -159,12 +172,17 @@
 <div class="member" id="method.append">
 <pre class="code">fun append(*this, vec: std::vector&lt;T&gt;) -&gt; unit </pre>
 <p>Appends all elements from <code>vec</code> to the end of this vector, resizing if necessary.</p>
+<p>The elements are moved out of <code>vec</code>, which is left empty. Panics if the allocation fails.</p>
 </div>
 <div class="member" id="method.capacity">
 <pre class="code">fun capacity(*const this) -&gt; uint64 </pre>
+<p>Returns the number of elements the vector can hold before it needs to reallocate.</p>
 </div>
 <div class="member" id="method.insert">
 <pre class="code">fun insert(*this, i: uint64, val: T) -&gt; unit </pre>
+<p>Inserts <code>val</code> at index <code>i</code>, shifting every element after it to the right.</p>
+<p><code>i</code> can be equal to <code>len()</code>, in which case this behaves like <code>push</code>.
+Panics if <code>i</code> is greater than <code>len()</code>, or if the reallocation fails.</p>
 </div>
 <div class="member" id="method.len">
 <pre class="code">fun len(*const this) -&gt; uint64 </pre>
@@ -172,6 +190,9 @@
 </div>
 <div class="member" id="method.new">
 <pre class="code">fun new(ptr: *T, len: uint64) -&gt; std::vector&lt;T&gt; </pre>
+<p>Creates a new vector by copying <code>len</code> elements starting at <code>ptr</code>.</p>
+<p>The elements are copied bitwise with <code>memcpy</code>, so the vector ends up owning a copy of them.
+Be careful with types that own resources: both the original and the copy will run their destructor.</p>
 </div>
 <div class="member" id="method.pop">
 <pre class="code">fun pop(*this) -&gt; T </pre>
@@ -181,43 +202,57 @@ Panics when the vector is empty.</p>
 <div class="member" id="method.push">
 <pre class="code">fun push(*this, val: T) -&gt; unit </pre>
 <p>Appends <code>val</code> to the end of the vector, resizing if necessary.</p>
+<p>Panics if the reallocation fails.</p>
 </div>
 <div class="member" id="method.set">
 <pre class="code">fun set(*this, index: uint64, val: T) -&gt; unit </pre>
 <p>Sets the element at <code>index</code> to <code>val</code>.
 Panics on out-of-bounds access.</p>
+<p>NB: The previous element is overwritten without running its destructor.</p>
 </div>
 <div class="member" id="method.take">
 <pre class="code">fun take(*this, index: uint64) -&gt; T </pre>
 <p>Takes an element out of the vector at the specified index,
 shifting subsequent elements to the left.</p>
+<p>Panics on out-of-bounds access.</p>
 </div>
 <div class="member" id="method.with_capacity">
 <pre class="code">fun with_capacity(capacity: uint64) -&gt; std::vector&lt;T&gt; </pre>
 <p>Creates a new std::vector with the specified capacity.</p>
+<p>The vector is empty, <code>capacity</code> only tells how many elements can be pushed before a reallocation happens.</p>
 </div>
 </section>
 <section>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~vector()</pre>
+<p>Deletes every element in <code>[0, length)</code>, then frees the buffer.</p>
 </div>
 </section>
 <section>
 <h2>Conformances</h2>
 <div class="member" id="conformance.std-indexable">
 <pre class="code">extend std::vector&lt;T&gt; with std::indexable</pre>
+<p>Index a vector with a <code>uint64</code>, giving back a pointer to the element. Out-of-bounds access panics.</p>
 <div class="member" id="conformance.std-indexable.type.index_t">
 <pre class="code">type index_t = uint64</pre>
+<p class="inherited">Documentation inherited from the concept:</p>
+<p>The type used to index the container.</p>
 </div>
 <div class="member" id="conformance.std-indexable.type.index_val_t">
 <pre class="code">type index_val_t = T</pre>
+<p class="inherited">Documentation inherited from the concept:</p>
+<p>The type of the values stored in the container.</p>
 </div>
 <div class="member" id="conformance.std-indexable.method.get">
 <pre class="code">fun get(*const this, index: std::vector&lt;T&gt;::index_t) -&gt; *const std::vector&lt;T&gt;::index_val_t </pre>
+<p>Returns a const pointer to the element at <code>index</code>.
+Panics on out-of-bounds access.</p>
 </div>
 <div class="member" id="conformance.std-indexable.method.get_mut">
 <pre class="code">fun get_mut(*this, index: std::vector&lt;T&gt;::index_t) -&gt; *std::vector&lt;T&gt;::index_val_t </pre>
+<p>Returns a mutable pointer to the element at <code>index</code>.
+Panics on out-of-bounds access.</p>
 </div>
 </div>
 </section>

@@ -1,24 +1,48 @@
+//! Compile time reflection. `type_of<T>()` and `type_id<T>()` give access to the informations the compiler knows about a type.
+
 #[core::intrinsic]
+//! Returns the `core::type_info` describing `T`.
+//!
+//! Everything in it is known at compile time, so this is free to call.
 public extern fun type_of<T>() -> core::type_info;
 
 #[core::intrinsic]
+//! Returns the unique id of `T`. Comparing two ids is the cheapest way to check if two types are the same.
+//!
+//! e.g. `std::any` uses it to check that you're casting to the right type
 public extern fun type_id<T>() -> uint64;
 
+//! Compiler provided items. Nothing in here is written in atlas, the compiler fills it in.
 namespace core {
     #[std::trivially_copyable]
+    //! Everything the compiler knows about a type. Obtained through `type_of<T>()`.
+    //!
+    //! The layout of this struct is tied to the compiler, so it will change alongside it.
     public struct type_info {
       public:
+        //! Unique id of the type. Same value as `type_id<T>()`
         id: uint64;
+        //! Name of the type as written in the source code (e.g. `std::vector<int64>`)
         name: str;
+        //! Name of the type once mangled by the compiler. Mostly useful for debugging the C output
         mangled_name: str;
+        //! Size of the type in bytes. Same value as `size_of<T>()`
         size: uint64;
+        //! Alignment of the type in bytes. Same value as `align_of<T>()`
         align: uint64;
+        //! Names of every method declared on the type
         method_names: [str];
+        //! Number of entries in `method_names`
         method_count: uint64;
+        //! Names of every field declared on the type
         field_names: [str];
+        //! Number of entries in `field_names`
         field_count: uint64;
+        //! Whether the type is tagged `#[std::trivially_copyable]`
         is_trivially_copyable: bool;
+        //! Whether the type implements `std::default`
         is_default: bool;
+        //! Whether the type implements `std::copyable`
         is_copyable: bool;
     }
 }

@@ -1,7 +1,18 @@
+//! A plain tuple of two values.
+//!
+//! NB: Not imported by `lib.atlas` yet.
+
 namespace std {
+    //! Two values of possibly different types, side by side. Nothing more.
+    //!
+    //! ```
+    //! let p = std::pair<int64, bool> { .a = 1, .b = true };
+    //! ```
     public struct pair<A, B> {
       public:
+        //! First value
         a: A;
+        //! Second value
         b: B;
     }
 }

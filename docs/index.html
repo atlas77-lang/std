@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="std/fn.copysignf64.html">copysignf64</a></div>
@@ -152,40 +152,41 @@
 </ul></section>
 <section>
 <h2>Functions</h2>
-<ul class="listing"><li><a href="fn.atomic_var_init.html"><code>ATOMIC_VAR_INIT</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="fn.atomic_var_init.html"><code>ATOMIC_VAR_INIT</code></a> <span class="blurb">Turns a plain `T` value into an `__atomic T`. Maps directly to the C11 macro of the same name.</span></li>
 <li><a href="fn.alignof.html"><code>alignof</code></a> <span class="blurb">For the people who can&#39;t add a little underscore...</span></li>
-<li><a href="fn.c_errno.html"><code>c_errno</code></a> <span class="blurb"></span></li>
+<li><a href="fn.c_errno.html"><code>c_errno</code></a> <span class="blurb">Returns the current value of the C `errno`. Same as `libc::errno`, kept at the top level for convenience.</span></li>
 <li><a href="fn.sizeof.html"><code>sizeof</code></a> <span class="blurb">For the people who can&#39;t add a little underscore...</span></li>
-<li><a href="fn.strerror.html"><code>strerror</code></a> <span class="blurb"></span></li>
+<li><a href="fn.strerror.html"><code>strerror</code></a> <span class="blurb">Returns the C error message matching the given error code. Same as `libc::str_error`, kept at the top level for convenience.</span></li>
 </ul></section>
 <section>
 <h2>Source files</h2>
-<ul class="listing"><li><a href="files/src-any.atlas.html"><code>src/any.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-atomic.atlas.html"><code>src/atomic.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-comparable.atlas.html"><code>src/concepts/comparable.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-copyable.atlas.html"><code>src/concepts/copyable.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-default.atlas.html"><code>src/concepts/default.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-extendable.atlas.html"><code>src/concepts/extendable.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-hashable.atlas.html"><code>src/concepts/hashable.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-indexable.atlas.html"><code>src/concepts/indexable.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-iterator.atlas.html"><code>src/concepts/iterator.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-concepts-number.atlas.html"><code>src/concepts/number.atlas</code></a> <span class="blurb"></span></li>
+<ul class="listing"><li><a href="files/src-any.atlas.html"><code>src/any.atlas</code></a> <span class="blurb">Type erasure. `std::any` can hold a value of any type and give it back to you later, as long as you ask for the right type.</span></li>
+<li><a href="files/src-atomic.atlas.html"><code>src/atomic.atlas</code></a> <span class="blurb">Atomic operations. A thin wrapper around the C11 `&lt;stdatomic.h&gt;` functions.</span></li>
+<li><a href="files/src-concepts.atlas.html"><code>src/concepts.atlas</code></a> <span class="blurb">Re-exports every concept of the std. Import this file to get all of them at once.</span></li>
+<li><a href="files/src-concepts-comparable.atlas.html"><code>src/concepts/comparable.atlas</code></a> <span class="blurb">`std::comparable` and `std::ordering`: total ordering, with every comparison operator derived from a single `compare` method.</span></li>
+<li><a href="files/src-concepts-copyable.atlas.html"><code>src/concepts/copyable.atlas</code></a> <span class="blurb">`std::copyable`: explicit duplication of a value through `.copy()`.</span></li>
+<li><a href="files/src-concepts-default.atlas.html"><code>src/concepts/default.atlas</code></a> <span class="blurb">`std::default`: the &quot;zero&quot; value of a type, through `T::default()`.</span></li>
+<li><a href="files/src-concepts-extendable.atlas.html"><code>src/concepts/extendable.atlas</code></a> <span class="blurb">`std::extendable`: containers that can absorb the content of an iterable. Nothing implements it yet.</span></li>
+<li><a href="files/src-concepts-hashable.atlas.html"><code>src/concepts/hashable.atlas</code></a> <span class="blurb">`std::hashable`: reducing a value to a `uint64`, as needed by `std::map&lt;K, V&gt;` keys.</span></li>
+<li><a href="files/src-concepts-indexable.atlas.html"><code>src/concepts/indexable.atlas</code></a> <span class="blurb">`std::indexable`: looking a container up by index or key, as done by `std::vector&lt;T&gt;` and `std::map&lt;K, V&gt;`.</span></li>
+<li><a href="files/src-concepts-iterator.atlas.html"><code>src/concepts/iterator.atlas</code></a> <span class="blurb">`std::iterator` and `std::iterable`: yielding values one at a time. Nothing implements them yet.</span></li>
+<li><a href="files/src-concepts-number.atlas.html"><code>src/concepts/number.atlas</code></a> <span class="blurb">`std::number`: the `MIN()`/`MAX()` bounds of every numeric primitive.</span></li>
 <li><a href="files/src-concepts-primitive.atlas.html"><code>src/concepts/primitive.atlas</code></a> <span class="blurb">Per the upcoming v0.10 design of the compiler, this std::primitive</span></li>
-<li><a href="files/src-concepts-to_string.atlas.html"><code>src/concepts/to_string.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-either.atlas.html"><code>src/either.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-expected.atlas.html"><code>src/expected.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-file.atlas.html"><code>src/file.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-io.atlas.html"><code>src/io.atlas</code></a> <span class="blurb"></span></li>
+<li><a href="files/src-concepts-to_string.atlas.html"><code>src/concepts/to_string.atlas</code></a> <span class="blurb">`std::to_string`: turning a value into a `std::string`.</span></li>
+<li><a href="files/src-either.atlas.html"><code>src/either.atlas</code></a> <span class="blurb">A value that is one of two types. `std::either&lt;L, R&gt;` holds either a `left: L` or a `right: R`.</span></li>
+<li><a href="files/src-expected.atlas.html"><code>src/expected.atlas</code></a> <span class="blurb">Error handling without exceptions. `std::expected&lt;T, E&gt;` holds either a value or an error.</span></li>
+<li><a href="files/src-file.atlas.html"><code>src/file.atlas</code></a> <span class="blurb">File system access. Reading and writing files, and iterating over the entries of a directory.</span></li>
+<li><a href="files/src-io.atlas.html"><code>src/io.atlas</code></a> <span class="blurb">Standard input/output. Printing, reading a line from the terminal and panicking.</span></li>
 <li><a href="files/src-libc.atlas.html"><code>src/libc.atlas</code></a> <span class="blurb"></span></li>
 <li><a href="files/src-map.atlas.html"><code>src/map.atlas</code></a> <span class="blurb">Robin Hood open-addressing hash map.</span></li>
-<li><a href="files/src-math.atlas.html"><code>src/math.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-memory.atlas.html"><code>src/memory.atlas</code></a> <span class="blurb"></span></li>
+<li><a href="files/src-math.atlas.html"><code>src/math.atlas</code></a> <span class="blurb">Math utilities backed by the C standard math library.</span></li>
+<li><a href="files/src-memory.atlas.html"><code>src/memory.atlas</code></a> <span class="blurb">Low-level memory helpers: allocation, moves, raw pointer reads/writes and the `size_of`/`align_of` intrinsics.</span></li>
 <li><a href="files/src-optional.atlas.html"><code>src/optional.atlas</code></a> <span class="blurb">Optional type utilities for values that may or may not be present.</span></li>
-<li><a href="files/src-reflection.atlas.html"><code>src/reflection.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-shared_ptr.atlas.html"><code>src/shared_ptr.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-string.atlas.html"><code>src/string.atlas</code></a> <span class="blurb">std::string library for Atlas `std::string`</span></li>
-<li><a href="files/src-time.atlas.html"><code>src/time.atlas</code></a> <span class="blurb"></span></li>
-<li><a href="files/src-vector.atlas.html"><code>src/vector.atlas</code></a> <span class="blurb"></span></li>
+<li><a href="files/src-reflection.atlas.html"><code>src/reflection.atlas</code></a> <span class="blurb">Compile time reflection. `type_of&lt;T&gt;()` and `type_id&lt;T&gt;()` give access to the informations the compiler knows about a type.</span></li>
+<li><a href="files/src-shared_ptr.atlas.html"><code>src/shared_ptr.atlas</code></a> <span class="blurb">Reference counted smart pointer: `std::shared_ptr&lt;T&gt;` and its (unfinished) companion `std::weak_ptr&lt;T&gt;`.</span></li>
+<li><a href="files/src-string.atlas.html"><code>src/string.atlas</code></a> <span class="blurb">Owned, heap allocated, null terminated string: `std::string`.</span></li>
+<li><a href="files/src-time.atlas.html"><code>src/time.atlas</code></a> <span class="blurb">Measuring time. `std::instant` is a point in time, `std::duration` is the distance between two of them.</span></li>
+<li><a href="files/src-vector.atlas.html"><code>src/vector.atlas</code></a> <span class="blurb">Growable, heap allocated array. The go-to container of the std.</span></li>
 </ul></section>
 </main>
 <footer>Generated by <code>atlas77 docs</code></footer>

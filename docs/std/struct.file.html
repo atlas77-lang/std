@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,6 +145,14 @@
 <h1><span class="kind">Struct</span> std::file</h1>
 <pre class="code">struct std::file</pre>
 <p class="source">Declared in <a href="../files/src-file.atlas.html">src/file.atlas</a></p>
+<p>An open file. Wrapper around a C <code>FILE*</code> that closes itself when destroyed.</p>
+<pre><code>let res = std::file::open("foo.txt");
+if res.is_expected() {
+    let f = res.expected_value();
+    let content = f.read_all();
+}
+</code></pre>
+<p>For the common “read the whole thing” case, <code>std::file::read_to_string(path)</code> does all of the above in one go.</p>
 <section>
 <h2>Methods</h2>
 <div class="member" id="method.create">
@@ -153,14 +161,17 @@
 </div>
 <div class="member" id="method.exists">
 <pre class="code">fun exists(path: *const uint8) -&gt; bool </pre>
+<p>Returns true if the file at <code>path</code> exists and can be opened for reading.</p>
 </div>
 <div class="member" id="method.flush">
 <pre class="code">fun flush(*this) -&gt; bool </pre>
 <p>Flush buffered file streams.</p>
+<p>Returns true on success, false if the file isn’t open or the flush failed.</p>
 </div>
 <div class="member" id="method.get_handle">
 <pre class="code">fun get_handle(*this) -&gt; *libc::FILE </pre>
 <p>Obtain direct access to underlying opaque C file handle.</p>
+<p>The <code>std::file</code> still owns the handle and will close it, don’t <code>fclose</code> it yourself.</p>
 </div>
 <div class="member" id="method.open">
 <pre class="code">fun open(path: *const uint8) -&gt; std::expected&lt;std::file, std::string&gt; </pre>
@@ -169,10 +180,12 @@
 <div class="member" id="method.open_with_mode">
 <pre class="code">fun open_with_mode(path: *const uint8, mode: std::FILE_MODE) -&gt; std::expected&lt;std::file, std::string&gt; </pre>
 <p>Open file with explicit mode flag.</p>
+<p>On failure, the error is the message matching the C <code>errno</code>.</p>
 </div>
 <div class="member" id="method.read_all">
 <pre class="code">fun read_all(*this) -&gt; std::expected&lt;std::string, std::string&gt; </pre>
 <p>Read the full content of an opened file handle into a std::string.</p>
+<p>The file is read from its start, whatever the current position was.</p>
 </div>
 <div class="member" id="method.read_to_string">
 <pre class="code">fun read_to_string(path: *const uint8) -&gt; std::expected&lt;std::string, std::string&gt; </pre>
@@ -181,16 +194,19 @@
 <div class="member" id="method.write">
 <pre class="code">fun write(*this, buf: *const uint8, size: uint64) -&gt; std::expected&lt;uint64, std::string&gt; </pre>
 <p>Write raw byte buffer to file.</p>
+<p>Returns the number of bytes written, or an error if fewer than <code>size</code> bytes could be written.</p>
 </div>
 <div class="member" id="method.write_all">
 <pre class="code">fun write_all(*this, str_val: *const std::string) -&gt; std::expected&lt;uint64, std::string&gt; </pre>
 <p>Write an entire string to file.</p>
+<p>Returns the number of bytes written.</p>
 </div>
 </section>
 <section>
 <h2>Destructor</h2>
 <div class="member" id="destructor">
 <pre class="code">~file()</pre>
+<p>Closes the file if it’s still open.</p>
 </div>
 </section>
 </main>

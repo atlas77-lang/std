@@ -1,4 +1,6 @@
-//WARNING: Outdated
+//! **Outdated**. Placeholder for a generic array iterator. Not imported by `lib.atlas`, don't use it.
+//! See `std::iterator` for the concept it is meant to implement.
+
 
 import "vector.atlas";
 import "optional.atlas";

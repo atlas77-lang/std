@@ -55,12 +55,12 @@
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_next.html">atlas_directory_next</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.atlas_directory_open.html">atlas_directory_open</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/struct.atomic.html">atomic</a></div>
+<div class="item" style="padding-left:16px"><a href="../std/enum.cast_error.html">cast_error</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrt.html">cbrt</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.cbrtf.html">cbrtf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceil.html">ceil</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.ceilf.html">ceilf</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.comparable.html">comparable</a></div>
-<div class="item" style="padding-left:16px"><a href="../std/fn.copy.html">copy</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/concept.copyable.html">copyable</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysign.html">copysign</a></div>
 <div class="item" style="padding-left:16px"><a href="../std/fn.copysignf64.html">copysignf64</a></div>
@@ -145,6 +145,10 @@
 <h1><span class="kind">Concept</span> std::primitive</h1>
 <pre class="code">concept std::primitive</pre>
 <p class="source">Declared in <a href="../files/src-concepts-primitive.atlas.html">src/concepts/primitive.atlas</a></p>
+<p>Marker concept for the built-in types: every integer, both floats, <code>char</code>, <code>bool</code> and <code>str</code>.</p>
+<p>It has no method. It only exists to constrain generics to types the compiler knows how to handle directly,
+e.g. <code>std::atomic&lt;T: std::primitive&gt;</code> or <code>std::string::to_string&lt;T: std::primitive&gt;</code>.
+You shouldn’t extend your own types with it.</p>
 <section>
 <h2>Implementors</h2>
 <div class="member">
