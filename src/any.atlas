@@ -112,7 +112,7 @@ namespace std {
                         std::cast_error::UNEQUIVALENT_CAST);
             }
             if this->val == null {
-                return std::expected<T,
+                return std::expected<
                     *T,
                     std::cast_error>::unexpected(
                         std::cast_error::MOVED_ANY_VALUE);
